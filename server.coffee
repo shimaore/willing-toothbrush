@@ -55,7 +55,7 @@ main = ->
     changes = cfg.prov.changes
       live: true
       include_docs: true
-      filter: "dns/changes"
+      filter: "#{couchapp.id}/changes"
       since: 'now'
 
     changes.on 'change', ->
