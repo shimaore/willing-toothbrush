@@ -1,0 +1,2 @@
+--reporter spec
+--compilers coffee.md:coffee-script/register
