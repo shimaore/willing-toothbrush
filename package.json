@@ -4,6 +4,7 @@
   "description": "CouchDB-backed DNS server for CCNQ4",
   "main": " ",
   "scripts": {
+    "pretest": "npm install",
     "test": "mocha"
   },
   "author": "Stéphane Alnet <stephane@shimaore.net> (http://stephane.shimaore.net/)",
@@ -21,5 +22,6 @@
   "devDependencies": {
     "chai": "^3.2.0",
     "mocha": "^2.3.0"
-  }
+  },
+  "private": true
 }
