@@ -1,6 +1,6 @@
 {
   "name": "willing-toothbrush",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "CouchDB-backed DNS server for CCNQ4",
   "main": " ",
   "scripts": {
