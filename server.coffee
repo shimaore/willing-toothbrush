@@ -49,9 +49,6 @@ main = ->
 
   server = dns.createServer()
 
-  # Initial configuration
-  configure cfg.prov, server
-
   server.listen process.env.DNS_PORT ? 53
 
   monitor = ->
@@ -59,6 +56,7 @@ main = ->
       live: true
       include_docs: true
       filter: "dns/changes"
+      since: 'now'
 
     changes.on 'change', ->
       configure cfg.prov, server
@@ -67,7 +65,11 @@ main = ->
       debug "Changes error: #{err}"
       monitor()
 
+  # Start monitoring changes
   monitor()
+
+  # Initial configuration
+  configure cfg.prov, server
   return
 
 dns = require "./src/dns"
