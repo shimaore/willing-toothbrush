@@ -40,6 +40,8 @@ install = (db) ->
   update db, couchapp
 
 main = seem ->
+  cfg = {}
+
   assert process.env.DNS_PREFIX_ADMIN?, 'Please provide DNS_PREFIX_ADMIN'
   cfg.prov = new PouchDB process.env.DNS_PREFIX_ADMIN
 
