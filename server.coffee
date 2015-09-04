@@ -21,7 +21,7 @@ configure = seem (db,server) ->
       zones.add_zone zone
 
   # Add any other records (hosts, ..)
-  {rows} = yield db.view 'dns/names'
+  {rows} = yield db.query 'dns/names'
 
   for rec in rows ? []
     do (rec) ->
