@@ -36,10 +36,10 @@ configure = seem (db,server) ->
 
 couchapp = require './couchapp'
 
-install = (db) ->
-  update db, couchapp
+install = seem (db) ->
+  yield update db, couchapp
 
-main = seem ->
+main = ->
   cfg = {}
 
   assert process.env.DNS_PREFIX_ADMIN?, 'Please provide DNS_PREFIX_ADMIN'
