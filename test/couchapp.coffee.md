@@ -5,3 +5,4 @@
       couchapp = require '../couchapp'
       it 'should return an object', ->
         couchapp.should.have.property '_id'
+        couchapp.should.have.property 'id'

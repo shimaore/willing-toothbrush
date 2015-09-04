@@ -1,8 +1,9 @@
     pkg = require './package.json'
-    design = "#{pkg.name}-#{pkg.version}-dns"
+    id = "#{pkg.name}-#{pkg.version}-dns"
 
     ddoc =
-      _id: "_design/#{design}"
+      _id: "_design/#{id}"
+      id: id
       package: pkg.name
       version: pkg.version
       language: 'javascript'
