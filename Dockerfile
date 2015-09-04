@@ -1,6 +1,14 @@
 FROM shimaore/debian:2.0.2
 MAINTAINER Stéphane Alnet <stephane@shimaore.net>
 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  build-essential \
+  ca-certificates \
+  curl \
+  git \
+  make \
+  supervisor
+
 # Install Node.js using `n`.
 RUN git clone https://github.com/tj/n.git
 WORKDIR n
