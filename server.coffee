@@ -76,7 +76,6 @@ pkg = require './package.json'
 debug = (require 'debug') pkg.name
 assert = require 'assert'
 PouchDB = require 'pouchdb'
-Nimble = require 'nimble-direction'
 update = require 'nimble-direction/update'
 
 module.exports = {configure,main,install}
