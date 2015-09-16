@@ -14,7 +14,7 @@
     "coffeescript-helpers": "^2.1.0",
     "debug": "^2.2.0",
     "freelist": "^1.0.3",
-    "nimble-direction": "^2.1.2",
+    "nimble-direction": "^2.2.0",
     "pouchdb": "^4.0.0",
     "seem": "^1.0.0",
     "underscore": "^1.8.3"
