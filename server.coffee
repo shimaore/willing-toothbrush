@@ -7,7 +7,7 @@ configure = seem (db,server) ->
   zones = new Zones()
 
   # Enumerate the domains listed in the database with a "records" field.
-  {rows} = yield db.query "#{couchapp.id}/domains', include_docs:true
+  {rows} = yield db.query "#{couchapp.id}/domains", include_docs:true
 
   for rec in rows ? []
     do (rec) ->
