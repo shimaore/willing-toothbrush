@@ -14,7 +14,7 @@ RUN git clone https://github.com/tj/n.git
 WORKDIR n
 RUN make install
 WORKDIR ..
-RUN n io 4.2.1
+RUN n 4.2.1
 ENV NODE_ENV production
 
 RUN apt-get update && apt-get -y --no-install-recommends install \
