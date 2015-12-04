@@ -39,6 +39,7 @@ exports.Zone = class Zone
     @records.push @create_record record
 
   defaults: ->
+    soa: @dot_domain
     ttl: 420
     serial: get_serial() # serial (YYYYMMDDrr)
     refresh: 840         # refresh (30 minutes)
@@ -77,7 +78,7 @@ exports.Zone = class Zone
     cb _(@records).find (record) -> (record.class == type) and (record.name == name)
 
   create_soa: ->
-    keys = "dot_domain admin serial refresh retry expire min_ttl"
+    keys = "soa admin serial refresh retry expire min_ttl"
     value = keys.split(" ").map((param) => @[param]).join(" ")
     {name: @dot_domain, @ttl, class: "SOA", value}
 
