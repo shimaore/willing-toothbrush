@@ -29,11 +29,14 @@ exports.Zone = class Zone
     @set_options(options)
     @records = (@create_record(record) for record in options.records or [])
     @select_class "SOA", (d) =>
-      if d.length == 0
-        @add_default_soa()
+      soa = @_soa()
+      if d.length is 0
+        @records.push soa
 
-  add_default_soa: ->
-    @records.push @create_soa()
+  _soa: ->
+    keys = "soa admin serial refresh retry expire min_ttl"
+    value = keys.split(" ").map((param) => @[param]).join(" ")
+    {name: @dot_domain, @ttl, class: "SOA", value}
 
   add_record: (record) ->
     @records.push @create_record record
@@ -76,12 +79,6 @@ exports.Zone = class Zone
 
   find: (type, name, cb) ->
     cb _(@records).find (record) -> (record.class == type) and (record.name == name)
-
-  create_soa: ->
-    keys = "soa admin serial refresh retry expire min_ttl"
-    value = keys.split(" ").map((param) => @[param]).join(" ")
-    {name: @dot_domain, @ttl, class: "SOA", value}
-
 
 class Response
   constructor: (name, @type, @zone, @server) ->
