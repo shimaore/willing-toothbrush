@@ -214,7 +214,7 @@ class DNS
     @reload zones
 
   reload: (zones) ->
-    zones.set_serial()
+    zones?.set_serial()
     @zones = zones
 
   listen: (port) ->
