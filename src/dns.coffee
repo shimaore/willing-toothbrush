@@ -28,10 +28,15 @@ exports.Zone = class Zone
     @dot_domain = dotize(domain)
     @set_options(options)
     @records = (@create_record(record) for record in options.records or [])
+    @set_serial get_serial()
+
+  set_serial: (@serial) ->
     @select_class "SOA", (d) =>
       soa = @_soa()
       if d.length is 0
         @records.push soa
+        return
+      d.value = soa.value
 
   _soa: ->
     keys = "soa admin serial refresh retry expire min_ttl"
@@ -44,7 +49,6 @@ exports.Zone = class Zone
   defaults: ->
     soa: @dot_domain
     ttl: 420
-    serial: get_serial() # serial (YYYYMMDDrr)
     refresh: 840         # refresh (30 minutes)
     retry: 900           # retry (15 minutes)
     expire: 1209600      # expire (2 weeks)
@@ -197,6 +201,9 @@ exports.Zones = class Zones
     domain = dotize domain
     @zones[domain]
 
+  set_serial: ->
+    serial = get_serial()
+    v.set_serial(serial) for k,v of @zones
 
 class DNS
 
@@ -207,6 +214,7 @@ class DNS
     @reload zones
 
   reload: (zones) ->
+    zones.set_serial()
     @zones = zones
 
   listen: (port) ->
