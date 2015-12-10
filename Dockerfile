@@ -21,6 +21,7 @@ ENV NODE_ENV production
 COPY . /opt/willing-toothbrush
 WORKDIR /opt/willing-toothbrush
 RUN mkdir -p log
-RUN npm install
+RUN npm install && \
+    npm cache clean
 
 CMD ["/usr/bin/supervisord","-n"]
