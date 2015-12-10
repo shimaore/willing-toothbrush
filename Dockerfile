@@ -18,9 +18,6 @@ WORKDIR ..
 RUN n 4.2.1
 ENV NODE_ENV production
 
-RUN apt-get update && apt-get -y --no-install-recommends install \
-  supervisor
-
 COPY . /opt/willing-toothbrush
 WORKDIR /opt/willing-toothbrush
 RUN mkdir -p log
