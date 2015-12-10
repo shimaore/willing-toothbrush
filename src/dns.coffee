@@ -30,7 +30,11 @@ exports.Zone = class Zone
     @records = (@create_record(record) for record in options.records or [])
     @set_serial get_serial()
 
-  set_serial: (@serial) ->
+  set_serial: (serial) ->
+    if @serial?
+      @serial++
+    else
+      @serial = serial
     @select_class "SOA", (d) =>
       soa = @_soa()
       if d.length is 0
