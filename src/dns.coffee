@@ -217,7 +217,7 @@ class DNS
       type = req.q[0].typeName
       if zone = @zones?.find_zone name
         response = new Response(name, type, zone, @)
-        response.resolve (r) ->
+        response.resolve (r) =>
           r.commit(req, res)
           @statistics.add 'responses', 1
           res.send()
