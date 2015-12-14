@@ -52,7 +52,7 @@ main = ->
 
   assert process.env.DNS_PREFIX_ADMIN?, 'Please provide DNS_PREFIX_ADMIN'
   cfg.prov = new PouchDB process.env.DNS_PREFIX_ADMIN
-  cfg.serial = get_serial()
+  cfg.serial = "#{get_serial()}"
   cfg.statistics = new CaringBand()
   cfg.web_port = process.env.DNS_WEB_PORT
 
