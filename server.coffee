@@ -4,7 +4,7 @@ get_serial = ->
   now = new Date()
   date = parseInt now.toJSON().replace(/[^\d]/g,'').slice(0,8)
   seq = Math.floor(100*(now.getHours()*60+now.getMinutes())/1440)
-  serial = date + seq
+  serial = date*100 + seq
 
 serial = get_serial()
 
@@ -38,6 +38,7 @@ configure = seem (db,server) ->
       zone = zones.get_zone(domain) ? zones.add_zone new Zone domain, {}
       zone.add_record rec.value
 
+  debug 'Reload zones', {serial}
   server.reload zones
   serial++
 
