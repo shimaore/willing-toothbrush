@@ -41,14 +41,14 @@ couchapp = require './couchapp'
 install = seem (db) ->
   yield update db, couchapp
 
+get_serial = ->
+  now = new Date()
+  date = parseInt now.toJSON().replace(/[^\d]/g,'').slice(0,8)
+  seq = Math.floor(100*(now.getHours()*60+now.getMinutes())/1440)
+  date*100+seq
+
 main = ->
   cfg = {}
-
-  get_serial = ->
-    now = new Date()
-    date = parseInt now.toJSON().replace(/[^\d]/g,'').slice(0,8)
-    seq = Math.floor(100*(now.getHours()*60+now.getMinutes())/1440)
-    serial = date*100 + seq
 
   assert process.env.DNS_PREFIX_ADMIN?, 'Please provide DNS_PREFIX_ADMIN'
   cfg.prov = new PouchDB process.env.DNS_PREFIX_ADMIN
@@ -72,6 +72,7 @@ main = ->
           uptime: process.uptime()
           memory: process.memoryUsage()
           version: pkg.version
+          serial: cfg.serial
 
       @get '/statistics', ->
         precision = @query.precision ? 7
@@ -111,6 +112,6 @@ update = require 'nimble-direction/update'
 CaringBand = require 'caring-band'
 Zappa = require 'zappajs'
 
-module.exports = {configure,main,install}
+module.exports = {configure,main,install,get_serial}
 if require.main is module
   main()
