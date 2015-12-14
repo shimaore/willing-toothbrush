@@ -1,21 +1,13 @@
 seem = require 'seem'
 
-get_serial = ->
-  now = new Date()
-  date = parseInt now.toJSON().replace(/[^\d]/g,'').slice(0,8)
-  seq = Math.floor(100*(now.getHours()*60+now.getMinutes())/1440)
-  serial = date*100 + seq
-
-serial = get_serial()
-
-configure = seem (db,server) ->
+configure = seem (cfg) ->
 
   debug "Loading zones"
 
   zones = new Zones()
 
   # Enumerate the domains listed in the database with a "records" field.
-  {rows} = yield db.query "#{couchapp.id}/domains", include_docs:true
+  {rows} = yield cfg.prov.query "#{couchapp.id}/domains", include_docs:true
 
   for rec in rows ? []
     do (rec) ->
@@ -25,11 +17,11 @@ configure = seem (db,server) ->
         debug 'Ignoring ENUM document', doc
         return
       else
-        zone = new Zone doc.domain, doc, serial
+        zone = new Zone doc.domain, doc, cfg.serial
       zones.add_zone zone
 
   # Add any other records (hosts, ..)
-  {rows} = yield db.query "#{couchapp.id}/names"
+  {rows} = yield cfg.prov.query "#{couchapp.id}/names"
 
   for rec in rows ? []
     do (rec) ->
@@ -38,9 +30,9 @@ configure = seem (db,server) ->
       zone = zones.get_zone(domain) ? zones.add_zone new Zone domain, {}
       zone.add_record rec.value
 
-  debug 'Reload zones', {serial}
-  server.reload zones
-  serial++
+  debug 'Reload zones', serial: cfg.serial
+  cfg.server.reload zones
+  cfg.serial++
 
   return
 
@@ -52,14 +44,39 @@ install = seem (db) ->
 main = ->
   cfg = {}
 
+  get_serial = ->
+    now = new Date()
+    date = parseInt now.toJSON().replace(/[^\d]/g,'').slice(0,8)
+    seq = Math.floor(100*(now.getHours()*60+now.getMinutes())/1440)
+    serial = date*100 + seq
+
   assert process.env.DNS_PREFIX_ADMIN?, 'Please provide DNS_PREFIX_ADMIN'
   cfg.prov = new PouchDB process.env.DNS_PREFIX_ADMIN
+  cfg.serial = get_serial()
+  cfg.statistics = new CaringBand()
+  cfg.web_port = process.env.DNS_WEB_PORT
 
   install cfg.prov
 
-  server = dns.createServer()
+  cfg.server = dns.createServer {}, cfg.statistics
 
-  server.listen process.env.DNS_PORT ? 53
+  cfg.server.listen process.env.DNS_PORT ? 53
+
+  if cfg.web_port?
+    Zappa.run cfg.web_port, io:no, ->
+
+      @get '/', ->
+        @json
+          ok:true
+          package: pkg.name
+          uptime: process.uptime()
+          memory: process.memoryUsage()
+          version: pkg.version
+
+      @get '/statistics', ->
+        precision = @query.precision ? 7
+        @res.type 'json'
+        @send cfg.statistics.toJSON precision
 
   monitor = ->
     changes = cfg.prov.changes
@@ -69,7 +86,7 @@ main = ->
       since: 'now'
 
     changes.on 'change', ->
-      configure cfg.prov, server
+      configure cfg
 
     changes.on 'error', (err) ->
       debug "Changes error: #{err}"
@@ -79,7 +96,7 @@ main = ->
   monitor()
 
   # Initial configuration
-  configure cfg.prov, server
+  configure cfg
   return
 
 dns = require "./src/dns"
@@ -91,6 +108,8 @@ debug = (require 'debug') pkg.name
 assert = require 'assert'
 PouchDB = require 'pouchdb'
 update = require 'nimble-direction/update'
+CaringBand = require 'caring-band'
+Zappa = require 'zappajs'
 
 module.exports = {configure,main,install}
 if require.main is module

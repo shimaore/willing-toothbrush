@@ -193,19 +193,21 @@ exports.Zones = class Zones
 
 class DNS
 
-  constructor: (zones) ->
+  constructor: (zones,@statistics) ->
     @server = ndns.createServer('udp4')
     @server.on 'request', @resolve
     @port or= 53
     @reload zones
 
   reload: (zones) ->
+    @statistics.add 'reload', 1
     @zones = zones
 
   listen: (port) ->
     @server.bind port or @port
 
   resolve: (req, res) =>
+    @statistics.add 'requests', 1
     res.setHeader(req.header)
     for q in req.q
       res.addQuestion(q)
@@ -217,8 +219,10 @@ class DNS
         response = new Response(name, type, zone, @)
         response.resolve (r) ->
           r.commit(req, res)
+          @statistics.add 'responses', 1
           res.send()
         return
+    @statistics.add 'empty-responses', 1
     res.send()
 
   close: ->
