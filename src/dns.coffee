@@ -14,27 +14,13 @@ dotize = (domain) ->
 undotize = (domain) ->
   if domain[-1..] != "." then domain else domain[..-2]
 
-get_serial = ->
-  now = new Date()
-  date = now.toJSON().replace(/[^\d]/g,'').slice(0,8)
-  seq = Math.floor(100*(now.getHours()*60+now.getMinutes())/1440)
-  seq = if seq < 10 then '0'+seq else ''+seq
-  serial = date + seq
-
 exports.Zone = class Zone
 
-  constructor: (domain, options) ->
+  constructor: (domain, options,@serial) ->
     @domain = undotize(domain)
     @dot_domain = dotize(domain)
     @set_options(options)
     @records = (@create_record(record) for record in options.records or [])
-    @set_serial get_serial()
-
-  set_serial: (serial) ->
-    if @serial?
-      @serial++
-    else
-      @serial = serial
     @select_class "SOA", (d) =>
       soa = @_soa()
       if d.length is 0
@@ -205,10 +191,6 @@ exports.Zones = class Zones
     domain = dotize domain
     @zones[domain]
 
-  set_serial: ->
-    serial = get_serial()
-    v.set_serial(serial) for k,v of @zones
-
 class DNS
 
   constructor: (zones) ->
@@ -218,7 +200,6 @@ class DNS
     @reload zones
 
   reload: (zones) ->
-    zones?.set_serial()
     @zones = zones
 
   listen: (port) ->

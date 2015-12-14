@@ -1,5 +1,13 @@
 seem = require 'seem'
 
+get_serial = ->
+  now = new Date()
+  date = parseInt now.toJSON().replace(/[^\d]/g,'').slice(0,8)
+  seq = Math.floor(100*(now.getHours()*60+now.getMinutes())/1440)
+  serial = date + seq
+
+serial = get_serial()
+
 configure = seem (db,server) ->
 
   debug "Loading zones"
@@ -17,7 +25,7 @@ configure = seem (db,server) ->
         debug 'Ignoring ENUM document', doc
         return
       else
-        zone = new Zone doc.domain, doc
+        zone = new Zone doc.domain, doc, serial
       zones.add_zone zone
 
   # Add any other records (hosts, ..)
@@ -31,6 +39,7 @@ configure = seem (db,server) ->
       zone.add_record rec.value
 
   server.reload zones
+  serial++
 
   return
 
