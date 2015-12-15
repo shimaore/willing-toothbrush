@@ -15,7 +15,7 @@ RUN git clone https://github.com/tj/n.git
 WORKDIR n
 RUN make install
 WORKDIR ..
-RUN n 4.2.1
+RUN n 4.2.3
 ENV NODE_ENV production
 
 COPY . /opt/willing-toothbrush
