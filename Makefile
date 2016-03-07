@@ -1,4 +1,4 @@
-NAME=shimaore/`jq -r .name package.json`
+NAME=`jq -r .docker_name package.json`
 TAG=`jq -r .version package.json`
 
 image: Dockerfile
