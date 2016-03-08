@@ -1,5 +1,6 @@
 FROM shimaore/debian:2.0.4
 MAINTAINER Stéphane Alnet <stephane@shimaore.net>
+ENV NODE_ENV production
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
   build-essential \
@@ -8,19 +9,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   git \
   make \
   python-pkg-resources \
-  supervisor
+  supervisor \
+  &&
 
 # Install Node.js using `n`.
-RUN git clone https://github.com/tj/n.git
-WORKDIR n
-RUN make install
-WORKDIR ..
-RUN n 4.2.3
-ENV NODE_ENV production
+  git clone https://github.com/tj/n.git n.git && \
+  cd n  && \
+  make install  && \
+  cd ..  && \
+  rm -rf n.git/  && \
+  n 4.3.2  && \
+  mkdir -p /opt/willing-toothbrush/log
 
 COPY . /opt/willing-toothbrush
 WORKDIR /opt/willing-toothbrush
-RUN mkdir -p log
 RUN npm install && \
     npm cache clean
 
