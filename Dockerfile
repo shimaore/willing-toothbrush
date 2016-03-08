@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Install Node.js using `n`.
   git clone https://github.com/tj/n.git n.git && \
-  cd n  && \
+  cd n.git  && \
   make install  && \
   cd ..  && \
   rm -rf n.git/  && \
