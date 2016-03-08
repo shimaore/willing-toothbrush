@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   make \
   python-pkg-resources \
   supervisor \
-  &&
+  && \
 
 # Install Node.js using `n`.
   git clone https://github.com/tj/n.git n.git && \
