@@ -1,1 +1,2 @@
 - Use https://github.com/trevoro/node-named instead of ndns? (but node-named doesn't support NAPTR either)
+- Contrarily to most other CCNQ4 apps, this one does not use the `nimble-direction` framework and does not include automated replication to a local CouchDB database. But since `nimble-direction` since version 2.2.0 supports local-only, this should be migrated to nimble-direction.
