@@ -1,4 +1,4 @@
-FROM shimaore/debian:2.0.6
+FROM shimaore/debian:2.0.10
 MAINTAINER Stéphane Alnet <stephane@shimaore.net>
 ENV NODE_ENV production
 
