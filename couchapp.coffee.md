@@ -33,6 +33,27 @@ Remember to update this filter if new doc.type's are handled by the views.
 
 Only return documents that will end up as domains that can be served
 
+* doc.domain DNS records. Note that some DNS entries are created automatically based on the database's content. These are individual, non-automated records.
+* doc.domain.type (string,required) `domain`
+* doc.domain.domain (string,required) The base name for the DNS records in this domain document.
+
+The following really belongs in server.coffee... if it was litterate.
+
+* doc.domain.admin (string,required) Admin email in DNS format.
+* doc.domain.soa (string,required) Name of the authoritative DNS server for this domain.
+* doc.domain.records (object) DNS records using the current domain as base. If not present, only a `SOA` entry is served.
+* doc.domain.ttl (integer) Time-to-Live (seconds). Default: 420
+* doc.domain.refresh (integer) Refresh interval (seconds). Default: 840
+* doc.domain.retry (integer) Retry interval (seconds). Default: 900
+* doc.domain.expire (integer) Expire interval (seconds). Default: 1209600
+* doc.domain.min_ttl (integer) Minimum time-to-live (seconds). Default: 1200
+
+* doc.domain.records[].class (string, required) Record class: `A`, ...
+* doc.domain.records[].value (string, required) The record's value, if the response contains a single field, for example for `CNAME`, `A`, `NS`, etc.
+* doc.domain.records[].value (array, required) The record's value. For example, for a `NAPTR` record: `[10,10,"s","SIP+D2U","","_sip._udp.example.net"]`; for a `SRV` record: `[10,10,5060,"sip-server.example.net"]`.
+* doc.domain.records[].ttl (integer) Record time-to-live, defaults to the domain's time-to-live.
+
+
         if doc.type? and doc.type is 'domain' and doc.records?
 
 Sort the documents so that the sub-domains are listed first.
@@ -94,6 +115,9 @@ RFC 4291 (multicast)
 
 ### Host-level records
 
+* doc.host.interfaces[].ipv4 Used to generate DNS `A` records. The first public address is used to designate the host, all interfaces are available as `<name>.<host>`.
+* doc.host.interfaces[].ipv6 Used to generate DNS `AAAA` records.
+
             if doc.interfaces?
 
               # FIXME IPv6 addresses should be canonalized
@@ -148,9 +172,14 @@ If no public IPv4 is present, use a private IPv4 for the primary interface.
 
 ### SIP records
 
+* doc.host.sip_domain_name (string) Base name for DNS SIP profiles.
+
             domain = doc.sip_domain_name
 
             if domain?
+
+* doc.host.sip_profiles Used for DNS
+
               if doc.sip_profiles?
 
                 for name, _ of doc.sip_profiles
@@ -164,6 +193,9 @@ Note: SRV records must use names. So if `ip_to_name` does not have a mapping we 
 (Also, `ingress_sip_ip` and `egress_sip_ip` are supposed to be local addresses, so if the "interfaces" field is populated properly this shouldn't be an issue.)
 
                       _sip_udp = '_sip._udp.'
+
+* doc.host.sip_profiles[].ingress_sip_ip (string) Mapped to the DNS name of an interface for the purpose of creating `_sip._udp.ingress-<name>.<sip_domain_name>` SRV records. Required.
+* doc.host.sip_profiles[].ingress_sip_port (integer) Port for DNS `_sip._udp.ingress-<name>.<sip_domain_name>` SRV records. Required.
 
                       emit domain,
                         prefix:_sip_udp+'ingress-'+name
@@ -189,6 +221,9 @@ UDP NAPTR
                           _sip_udp+'ingress-'+fqdn
                         ]
 
+* doc.host.sip_profiles[].egress_sip_ip (string) Mapped to the DNS name of an interface for the purpose of creating `_sip._udp.ingress-<name>.<sip_domain_name>` SRV records. Default: doc.host.sip_profiles[].ingress_sip_ip
+* doc.host.sip_profiles[].egress_sip_port (integer) Port for DNS `_sip._udp.ingress-<name>.<sip_domain_name>` SRV records. Default: 10000 + doc.host.sip_profiles[].ingress_sip_port
+
                       emit domain,
                         prefix:_sip_udp+'egress-'+name
                         class:'SRV'
@@ -210,11 +245,16 @@ UDP NAPTR
                           _sip_udp+'egress-'+fqdn
                         ]
 
+* doc.host.opensips Used for DNS. Required if the host is running OpenSIPS.
+
               if doc.opensips?
                 # FIXME detect whether proxy_ip is v4 or v6
                 # and use A or AAAA accordingly
 
 Note: if proxy_ip is not specified, opensips will be available on all interfaces. Pick the primary one for the public A record, in that case.
+
+* doc.host.opensips.proxy_ip Used to create a DNS `A` record for doc.host.sip_domain_name. Default: public IPv4 address of the host.
+* doc.host.opensips.proxy_port Used to create a DNS `SRV` record for doc.host.sip_domain_name. Default: 5060.
 
                 if doc.opensips.proxy_ip? or primary_v4?
                   emit domain,
