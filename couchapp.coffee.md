@@ -222,7 +222,7 @@ UDP NAPTR
                         ]
 
 * doc.host.sip_profiles[].egress_sip_ip (string) Mapped to the DNS name of an interface for the purpose of creating `_sip._udp.ingress-<name>.<sip_domain_name>` SRV records. Default: doc.host.sip_profiles[].ingress_sip_ip
-* doc.host.sip_profiles[].egress_sip_port (integer) Port for DNS `_sip._udp.ingress-<name>.<sip_domain_name>` SRV records. Default: 10000 + doc.host.sip_profiles[].ingress_sip_port
+* doc.host.sip_profiles[].egress_sip_port (integer) Port for DNS `_sip._udp.egress-<name>.<sip_domain_name>` SRV records. Default: 10000 + doc.host.sip_profiles[].ingress_sip_port
 
                       emit domain,
                         prefix:_sip_udp+'egress-'+name
