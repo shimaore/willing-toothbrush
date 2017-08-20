@@ -12,19 +12,19 @@
   "license": "Unlicense",
   "dependencies": {
     "caring-band": "^1.4.3",
-    "coffee-script": "^1.10.0",
+    "coffee-script": "^1.12.7",
     "coffeescript-helpers": "^2.2.0",
-    "debug": "^2.2.0",
+    "debug": "^3.0.0",
     "freelist": "^1.0.3",
-    "nimble-direction": "^4.2.1",
-    "pouchdb": "^5.4.5",
+    "nimble-direction": "^6.2.2",
+    "pouchdb": "^6.3.4",
     "seem": "^2.0.0",
     "underscore": "^1.8.3",
-    "zappajs": "^5.0.1"
+    "zappajs": "^6.4.1"
   },
   "devDependencies": {
-    "chai": "^3.5.0",
-    "mocha": "^3.0.1"
+    "chai": "^4.1.1",
+    "mocha": "^3.5.0"
   },
   "private": true
 }

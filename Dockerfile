@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   make install  && \
   cd ..  && \
   rm -rf n.git/  && \
-  n 4.3.2  && \
+  n 8.4.0  && \
   mkdir -p /opt/willing-toothbrush/log
 
 COPY . /opt/willing-toothbrush
