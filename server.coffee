@@ -105,9 +105,9 @@ Zone = dns.Zone
 Zones = dns.Zones
 
 pkg = require './package.json'
-debug = (require 'debug') pkg.name
+debug = (require 'tangible') pkg.name
 assert = require 'assert'
-PouchDB = require 'pouchdb'
+PouchDB = require 'ccnq4-pouchdb'
 update = require 'nimble-direction/update'
 CaringBand = require 'caring-band'
 Zappa = require 'zappajs'

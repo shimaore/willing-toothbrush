@@ -5,14 +5,7 @@
 
 var util = require ('util');
 
-var debug;
-var debugLevel = parseInt(process.env.NODE_DEBUG, 16);
-if(debugLevel & 0x4) {
-  debug = function (x) { util.error('NDNS: ' + x); };
-  debug ('debug enabled');
-} else {
-  debug = function () { };
-}
+var debug = require('tangible')('willing-toothbrush:ndns');
 
 var dgram = require('dgram');
 var events = require('events');
@@ -243,22 +236,22 @@ var digitvalue = [
   ];
 
 var hexvalue = [
-"00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "0a", "0b", "0c", "0d", "0e", "0f", 
-  "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "1a", "1b", "1c", "1d", "1e", "1f", 
-  "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "2a", "2b", "2c", "2d", "2e", "2f", 
-  "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "3a", "3b", "3c", "3d", "3e", "3f", 
-  "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "4a", "4b", "4c", "4d", "4e", "4f", 
-  "50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "5a", "5b", "5c", "5d", "5e", "5f", 
-  "60", "61", "62", "63", "64", "65", "66", "67", "68", "69", "6a", "6b", "6c", "6d", "6e", "6f", 
-  "70", "71", "72", "73", "74", "75", "76", "77", "78", "79", "7a", "7b", "7c", "7d", "7e", "7f", 
-  "80", "81", "82", "83", "84", "85", "86", "87", "88", "89", "8a", "8b", "8c", "8d", "8e", "8f", 
-  "90", "91", "92", "93", "94", "95", "96", "97", "98", "99", "9a", "9b", "9c", "9d", "9e", "9f", 
-  "a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8", "a9", "aa", "ab", "ac", "ad", "ae", "af", 
-  "b0", "b1", "b2", "b3", "b4", "b5", "b6", "b7", "b8", "b9", "ba", "bb", "bc", "bd", "be", "bf", 
-  "c0", "c1", "c2", "c3", "c4", "c5", "c6", "c7", "c8", "c9", "ca", "cb", "cc", "cd", "ce", "cf", 
-  "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "d8", "d9", "da", "db", "dc", "dd", "de", "df", 
-  "e0", "e1", "e2", "e3", "e4", "e5", "e6", "e7", "e8", "e9", "ea", "eb", "ec", "ed", "ee", "ef", 
-  "f0", "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "fa", "fb", "fc", "fd", "fe", "ff", 
+"00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "0a", "0b", "0c", "0d", "0e", "0f",
+  "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "1a", "1b", "1c", "1d", "1e", "1f",
+  "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "2a", "2b", "2c", "2d", "2e", "2f",
+  "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "3a", "3b", "3c", "3d", "3e", "3f",
+  "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "4a", "4b", "4c", "4d", "4e", "4f",
+  "50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "5a", "5b", "5c", "5d", "5e", "5f",
+  "60", "61", "62", "63", "64", "65", "66", "67", "68", "69", "6a", "6b", "6c", "6d", "6e", "6f",
+  "70", "71", "72", "73", "74", "75", "76", "77", "78", "79", "7a", "7b", "7c", "7d", "7e", "7f",
+  "80", "81", "82", "83", "84", "85", "86", "87", "88", "89", "8a", "8b", "8c", "8d", "8e", "8f",
+  "90", "91", "92", "93", "94", "95", "96", "97", "98", "99", "9a", "9b", "9c", "9d", "9e", "9f",
+  "a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8", "a9", "aa", "ab", "ac", "ad", "ae", "af",
+  "b0", "b1", "b2", "b3", "b4", "b5", "b6", "b7", "b8", "b9", "ba", "bb", "bc", "bd", "be", "bf",
+  "c0", "c1", "c2", "c3", "c4", "c5", "c6", "c7", "c8", "c9", "ca", "cb", "cc", "cd", "ce", "cf",
+  "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "d8", "d9", "da", "db", "dc", "dd", "de", "df",
+  "e0", "e1", "e2", "e3", "e4", "e5", "e6", "e7", "e8", "e9", "ea", "eb", "ec", "ed", "ee", "ef",
+  "f0", "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "fa", "fb", "fc", "fd", "fe", "ff",
   ];
 
 var digits = "0123456789";
@@ -1419,7 +1412,7 @@ DNSParser.prototype.parseUInt32 = function () {
   this.parseStart += 4;
 
   return (this.buf[this.parseStart-4] * 16777216 +
-      this.buf[this.parseStart-3] * 65536 + 
+      this.buf[this.parseStart-3] * 65536 +
       this.buf[this.parseStart-2] * 256 +
       this.buf[this.parseStart-1] );
 };
@@ -1472,12 +1465,12 @@ DNSParser.prototype.parseEDNS = function () {
   //	var out = this.parseUInt16 ();
   //	debug (out);
 
-  debug (this.parseStart);
-  debug (this.parseEnd);
+  // debug (this.parseStart);
+  // debug (this.parseEnd);
 };
 
 DNSParser.prototype.parseRRSIGSigner = function () { // kinda like unpack of a name, but without compression
-  //	debug ('DNSParser.prototype.parseRRSIGSigner');
+  debug ('DNSParser.prototype.parseRRSIGSigner');
 
   var name = new Buffer(ns_maxdname);
   var start = 0;
@@ -1513,7 +1506,7 @@ DNSParser.prototype.parseRRSIG = function (rrsig) {
   //	a 1 octet Algorithm field,
   //	a 1 octet Labels field,
   //	a 4 octet Original   TTL field,
-  //	a 4 octet Signature Expiration field, 
+  //	a 4 octet Signature Expiration field,
   //	a 4 octet Signature Inception field,
   //	a 2 octet Key tag,
   //	the Signer's Name field, -> length[0],name[length],length[0],name[length],0
@@ -1631,10 +1624,6 @@ DNSParser.prototype.parseDS = function (ds) {
   ds.digesttype = this.parseUInt8 ();
 
   var len = this.parseEnd - this.parseStart;
-
-  debug ('len');
-  debug (len);
-
   var signature = new Buffer (len);
 
   this.buf.copy (signature, 0, this.parseStart, this.parseStart+len);
@@ -1695,25 +1684,23 @@ DNSParser.prototype.parseRR = function (rr) {
   rr.name = this.parseName();
   rr.type = this.parseUInt16();
   if (rr.type == 41) {
+    // udp payload size
     rr.payloadsize = this.parseUInt16();
-    //		debug ('payloadsize'); // udp payload size
-    //		debug (rr.payloadsize);
+    // debug ('payloadsize', rr.payloadsize);
 
+    // extended RCODE
     rr.extrcode = this.parseUInt8();
-    //		debug ('extrcode');
-    //		debug (rr.extrcode); // extended RCODE
+    // debug ('extrcode', rr.extrcode);
 
+    // EDNS0 version
     rr.ednsversion = this.parseUInt8();
-    //		debug ('ednsversion');
-    //		debug (rr.ednsversion); // EDNS0 version
+    // debug ('ednsversion', rr.ednsversion);
 
     rr.zero = this.parseUInt16();
-    //		debug ('zero');
-    //		debug (rr.zero);
+    // debug ('zero', rr.zero);
 
     rr.rdlength = this.parseUInt16();
-    //		debug ('length');
-    //		debug (rr.rdlength);
+    // debug ('length', rr.rdlength);
   } else {
     rr.class = this.parseUInt16();
     rr.ttl = this.parseUInt32();
@@ -1772,27 +1759,27 @@ DNSParser.prototype.parseRR = function (rr) {
 
       if (rr.type == 46) {
         try {
-          debug (rr.name);
-          debug (rr.rdlength);
+          // debug ('name',rr.name);
+          // debug ('length',rr.rdlength);
           this.parseRRSIG (rr.rdata);
-          debug (this.parseEnd - this.parseStart);
+          // debug ('parsed',this.parseEnd - this.parseStart);
         } catch (exprrsig) { debug ('error in parseRRSIG: '+exprrsig.toString ()); }
       }
 
       if (rr.type == 43) {
         try {
-          debug (rr.name);
-          debug (rr.rdlength);
+          // debug (rr.name);
+          // debug (rr.rdlength);
           this.parseDS(rr.rdata);
-          debug (this.parseEnd - this.parseStart);
+          // debug (this.parseEnd - this.parseStart);
         } catch (expds) { debug ('error in parseDS: '+expds.toString ()); }
       }
 
       if (rr.type == 41) { // has no data, nothing much to do ?
         try {
-          debug (rr.rdlength);
+          // debug (rr.rdlength);
           this.parseEDNS ();
-          debug (this.parseEnd - this.parseStart);
+          // debug (this.parseEnd - this.parseStart);
         } catch (expedns) { debug ('error in parseEDNS: '+expedns.toString ()); }
       }
 
@@ -1872,8 +1859,7 @@ DNSWriter.prototype.endRdata = function () {
     return;
 
   var rdlength = this.writeStart - this.rdstart;
-  debug (rdlength)
-    this.buf[this.rdstart-2] = (rdlength >> 8) & 0xff;
+  this.buf[this.rdstart-2] = (rdlength >> 8) & 0xff;
   this.buf[this.rdstart-1] = (rdlength) & 0xff;
 };
 
@@ -2109,7 +2095,7 @@ DNSWriter.prototype.writeAAAA = function (aaaa) {
   }
 
   tmp = aaaa.split(":");
-  if (tmp.length != 8) 
+  if (tmp.length != 8)
     throw new Error("writeAAAAL: IPV6 String must have exactly 7 colons");
 
   for (var i = 0; i < 8; i++)
@@ -2126,8 +2112,7 @@ DNSWriter.prototype.writeLengthName = function (txt) {
 }
 
 DNSWriter.prototype.writeRR = function (rr) {
-  debug('DNSWriter.prototype.writeRR');
-  debug(rr.type);
+  debug('DNSWriter.prototype.writeRR', rr.type);
 
   this.writeName(rr.name);
   this.writeUInt16(rr.type);

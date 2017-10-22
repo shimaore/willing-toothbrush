@@ -1,6 +1,10 @@
+.editorconfig
 node_modules
+test
 .git
-Makefile
+.gitignore
+.travis.yml
 TODO
+.dockerignore
 Dockerfile
 README.md
