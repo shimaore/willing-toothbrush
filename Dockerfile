@@ -6,4 +6,4 @@ RUN npm install && \
     npm run build && \
     npm cache clean -f
 USER node
-ENTRYPOINT ["/sbin/tini","--","node","servers.js"]
+ENTRYPOINT ["/sbin/tini","--","node","server.js"]
