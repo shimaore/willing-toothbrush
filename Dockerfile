@@ -5,5 +5,5 @@ WORKDIR /src/app
 RUN npm install && \
     npm run build && \
     npm cache clean -f
-USER node
+USER root
 ENTRYPOINT ["/sbin/tini","--","node","server.js"]
