@@ -1,13 +1,11 @@
-seem = require 'seem'
-
-configure = seem (cfg) ->
+configure = (cfg) ->
 
   debug "Loading zones"
 
   zones = new Zones()
 
   # Enumerate the domains listed in the database with a "records" field.
-  {rows} = yield cfg.prov.query "#{couchapp.id}/domains", include_docs:true
+  {rows} = await cfg.prov.query "#{couchapp.id}/domains", include_docs:true
 
   for rec in rows ? []
     do (rec) ->
@@ -21,7 +19,7 @@ configure = seem (cfg) ->
       zones.add_zone zone
 
   # Add any other records (hosts, ..)
-  {rows} = yield cfg.prov.query "#{couchapp.id}/names"
+  {rows} = await cfg.prov.query "#{couchapp.id}/names"
 
   for rec in rows ? []
     do (rec) ->
@@ -38,8 +36,8 @@ configure = seem (cfg) ->
 
 couchapp = require './couchapp'
 
-install = seem (db) ->
-  yield update db, couchapp
+install = (db) ->
+  await update db, couchapp
 
 get_serial = ->
   now = new Date()
@@ -107,7 +105,7 @@ Zones = dns.Zones
 pkg = require './package.json'
 debug = (require 'debug') pkg.name
 assert = require 'assert'
-PouchDB = require 'pouchdb'
+PouchDB = require 'ccnq4-pouchdb'
 update = require 'nimble-direction/update'
 CaringBand = require 'caring-band'
 Zappa = require 'zappajs'
