@@ -206,7 +206,7 @@ class DNS
   listen: (port) ->
     @server.bind port or @port
 
-  resolve: (req, res) =>
+  resolve: (req, res) ->
     @statistics.add 'requests', 1
     res.setHeader(req.header)
     for q in req.q
