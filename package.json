@@ -1,7 +1,7 @@
 {
   "name": "willing-toothbrush",
   "docker_name": "shimaore/willing-toothbrush",
-  "version": "1.2.8",
+  "version": "2.0.0",
   "description": "CouchDB-backed DNS server for CCNQ4",
   "main": " ",
   "scripts": {
