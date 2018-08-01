@@ -195,7 +195,7 @@ class DNS
 
   constructor: (zones,@statistics) ->
     @server = ndns.createServer('udp4')
-    @server.on 'request', @resolve
+    @server.on 'request', @resolve.bind this
     @port or= 53
     @reload zones
 
