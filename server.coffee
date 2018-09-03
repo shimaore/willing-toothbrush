@@ -51,31 +51,13 @@ main = ->
   assert process.env.DNS_PREFIX_ADMIN?, 'Please provide DNS_PREFIX_ADMIN'
   cfg.prov = new PouchDB process.env.DNS_PREFIX_ADMIN
   cfg.serial = "#{get_serial()}"
-  cfg.statistics = new CaringBand()
   cfg.web_port = process.env.DNS_WEB_PORT
 
   install cfg.prov
 
-  cfg.server = dns.createServer {}, cfg.statistics
+  cfg.server = dns.createServer {}
 
   cfg.server.listen process.env.DNS_PORT ? 53
-
-  if cfg.web_port?
-    Zappa.run cfg.web_port, io:no, ->
-
-      @get '/', ->
-        @json
-          ok:true
-          package: pkg.name
-          uptime: process.uptime()
-          memory: process.memoryUsage()
-          version: pkg.version
-          serial: cfg.serial
-
-      @get '/statistics', ->
-        precision = @query.precision ? 7
-        @res.type 'json'
-        @send cfg.statistics.toJSON precision
 
   monitor = ->
     changes = cfg.prov.changes
@@ -107,7 +89,6 @@ debug = (require 'debug') pkg.name
 assert = require 'assert'
 PouchDB = require 'ccnq4-pouchdb'
 update = require 'nimble-direction/update'
-CaringBand = require 'caring-band'
 Zappa = require 'zappajs'
 
 module.exports = {configure,main,install,get_serial}
