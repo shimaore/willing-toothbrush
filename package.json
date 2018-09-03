@@ -12,14 +12,12 @@
   "author": "Stéphane Alnet <stephane@shimaore.net> (http://stephane.shimaore.net/)",
   "license": "Unlicense",
   "dependencies": {
-    "caring-band": "^1.4.3",
     "ccnq4-pouchdb": "^1.1.2",
     "coffeescript-helpers": "^2.2.0",
     "debug": "^3.1.0",
     "freelist": "^1.0.3",
     "nimble-direction": "^7.1.2",
-    "underscore": "^1.9.1",
-    "zappajs": "^6.5.0"
+    "underscore": "^1.9.1"
   },
   "devDependencies": {
     "chai": "^4.1.1",
