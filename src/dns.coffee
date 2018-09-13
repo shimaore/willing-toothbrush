@@ -6,13 +6,16 @@
 dgram = require('dgram')
 ndns = require('./ndns')
 shuffle = require './shuffle'
-_ = require("underscore")
 
 dotize = (domain) ->
   if domain[-1..] == "." then domain else domain + "."
 
 undotize = (domain) ->
   if domain[-1..] != "." then domain else domain[..-2]
+
+{isArray} = Array
+
+isEmpty = (o) -> Object.entries(o).length is 0
 
 exports.Zone = class Zone
 
@@ -21,7 +24,8 @@ exports.Zone = class Zone
     @dot_domain = dotize(domain)
     @set_options(options)
     @records = (@create_record(record) for record in options.records or [])
-    @select_class "SOA", (d) =>
+    @select_class "SOA"
+    .forEach (d) =>
       soa = @_soa()
       if d.length is 0
         @records.push soa
@@ -62,29 +66,28 @@ exports.Zone = class Zone
     r.name = if r.prefix? then dotize(r.prefix) + @dot_domain else @dot_domain
     r
 
-  select_class: (type,cb) ->
-    cb _(@records).filter (record) -> record.class == type
+  select_class: (type) ->
+    @records.filter (record) -> record.class == type
 
-  find_class: (type,cb) ->
-    cb _(@records).find (record) -> record.class == type
+  find_class: (type) ->
+    @records.find (record) -> record.class == type
 
-  select: (type, name, cb) ->
-    cb _(@records).filter (record) -> (record.class == type) and (record.name == name)
+  select: (type, name) ->
+    @records.filter (record) -> (record.class == type) and (record.name == name)
 
-  find: (type, name, cb) ->
-    cb _(@records).find (record) -> (record.class == type) and (record.name == name)
+  find: (type, name) ->
+    @records.find (record) -> (record.class == type) and (record.name == name)
 
 class Response
-  constructor: (name, @type, @zone, @server) ->
-    @name = dotize name
+  constructor: (@server) ->
     @answer = []
     @authoritative = []
     @additional = []
     #TODO response record limit 18
 
   add: (obj, to) ->
-    if obj? and not _(obj).isEmpty()
-      if _(obj).isArray()
+    if obj? and not isEmpty(obj)
+      if isArray obj
         for o in obj
           to.push o
       else
@@ -102,69 +105,74 @@ class Response
   add_additional: (record) ->
     @add(record, @additional)
 
-  add_ns_records: (cb) ->
-    @zone.select_class "NS", (d) =>
-      @add_authoritative shuffle d
-      cb()
+  add_ns_records: (zone) ->
+    zone
+    .select_class "NS"
+    .forEach (d) => @add_authoritative shuffle d
 
-  add_additionals: (cb) ->
-    for record in _.union(@answer, @authoritative)
-      do (record) =>
-        name = dotize record.value
-        # Only do the resolution for explicit names (e.g. CNAME, NS)
-        return unless typeof name is 'string'
-        zone = @server.zones?.find_zone name
-        # Nothing to add if we don't know about that zone.
-        return unless zone?
+  add_additionals: ->
+    [@answer..., @authoritative...].forEach (record) =>
+      name = dotize record.value
+      # Only do the resolution for explicit names (e.g. CNAME, NS)
+      return unless typeof name is 'string'
+      zone = @server.zones?.find_zone name
+      # Nothing to add if we don't know about that zone.
+      return unless zone?
 
-        old_cb = cb
-        cb = =>
-          zone.find "A", name, (d) =>
-            @add_additional shuffle d
-            zone.find "AAAA", name, (d) =>
-              @add_additional shuffle d
-              old_cb()
-    cb()
+      zone
+      .find "A", name
+      .forEach (d) => @add_additional shuffle d
+      zone
+      .find "AAAA", name
+      .forEach (d) => @add_additional shuffle d
+    return
 
-  add_soa_to_authoritative: (cb) ->
-    @zone.find_class "SOA", (d) =>
-      @add_authoritative d
-      cb()
+  add_soa_to_authoritative: (zone) ->
+    zone
+    .find_class "SOA"
+    .forEach (d) => @add_authoritative d
 
-  resolve: (cb) ->
-    finalize = =>
-      # always add additional records if there are any useful
-      @add_additionals =>
-        cb @
+  resolve: (name,type,zone) ->
+    name = dotize name
 
     # If a CNAME answer is available, always provide it.
-    @zone.select "CNAME", @name, (d) =>
-      if @add_answer d
-        return finalize()
+    cnames = zone.select "CNAME", name
 
-      # No CNAME, lookup record
-      @zone.select @type, @name, (d) =>
-        if @type is 'NS' or @type is 'A' or @type is 'AAAA'
-          shuffle d
+    if cnames.length > 0
+      cnames.forEach (d) ->
         if @add_answer d
-          if @type == "NS"
-            finalize()
-          else
-            @add_ns_records finalize
-        else
-          # empty response, SOA in authoritative section
-          @add_soa_to_authoritative finalize
+          @add_additionals()
+      return
+
+    # No CNAME, lookup record
+    zone
+    .select type, name
+    .forEach (d) =>
+      if type is 'NS' or type is 'A' or type is 'AAAA'
+        shuffle d
+      if @add_answer d
+        if type isnt "NS"
+          @add_ns_records zone
+        @add_additionals()
+      else
+        # empty response, SOA in authoritative section
+        @add_soa_to_authoritative zone
+    return
 
   commit: (req, res) ->
+    for q in req.q
+      res.addQuestion(q)
+
     ancount = @answer.length
     nscount = @authoritative.length
     arcount = @additional.length
 
+    res.id = req.id
     for key, val of { qr: 1, ra: 0, rd: 1, aa: 1, ancount, nscount, arcount }
       res.header[key] = val
 
-    for record in _.union(@answer, @authoritative, @additional)
-      value = if _(record.value).isArray() then record.value else record.value.split " "
+    for record in [@answer..., @authoritative..., @additional...]
+      value = if isArray(record.value) then record.value else record.value.split " "
       res.addRR record.name, record.ttl, "IN", record.class, value...
     @
 
@@ -211,19 +219,15 @@ class DNS
   resolve: (req, res) ->
     @statistics.requests++
 
-    res.setHeader(req.header)
-    for q in req.q
-      res.addQuestion(q)
+    response = new Response this
 
-    if req.q.length > 0
-      name = req.q[0].name
-      type = req.q[0].typeName
+    req.q.forEach (q) =>
+      name = q.name
+      type = q.typeName
       if zone = @zones?.find_zone name
-        response = new Response(name, type, zone, @)
-        response.resolve (r) =>
-          r.commit(req, res)
-          res.send()
-        return
+        response.resolve name, type, zone
+
+    r.commit(req, res)
     res.send()
 
   close: ->
