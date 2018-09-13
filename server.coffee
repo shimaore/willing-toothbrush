@@ -93,6 +93,9 @@ if require.main is module
   main()
   .then ->
     debug 'Started'
+    setInterval ->
+      debug 'Requests', cfg.server.statistics.requests.toString(10)
+    , 30*1000
   .catch (error) ->
     console.log error
     Promise.reject error
