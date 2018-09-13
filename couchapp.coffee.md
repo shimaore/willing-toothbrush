@@ -1,5 +1,6 @@
     pkg = require './package.json'
-    id = "#{pkg.name}-#{pkg.version}-dns"
+    app_version = '2.0'
+    id = "#{pkg.name}-#{app_version}-dns"
 
     ddoc =
       _id: "_design/#{id}"
