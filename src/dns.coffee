@@ -227,7 +227,7 @@ class DNS
       if zone = @zones?.find_zone name
         response.resolve name, type, zone
 
-    r.commit(req, res)
+    response.commit(req, res)
     res.send()
 
   close: ->
