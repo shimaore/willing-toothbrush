@@ -6,7 +6,7 @@ configure = (cfg) ->
 
   debug 'Enumerate the domains listed in the database with a "records" field.'
   await cfg.prov
-    .query "#{couchapp.id}/domains", include_docs:true
+    .query couchapp.id, 'domains', include_docs:true
     .observe (rec) ->
       doc = rec.doc
       return if not doc?
@@ -21,7 +21,7 @@ configure = (cfg) ->
 
   debug 'Add any other records (hosts, ..)'
   await cfg.prov
-    .query "#{couchapp.id}/names"
+    .query couchapp.id, 'names'
     .observe (rec) ->
       domain = rec.key
       return unless domain?
