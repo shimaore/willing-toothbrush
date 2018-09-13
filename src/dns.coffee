@@ -201,6 +201,9 @@ class DNS
     @port or= 53
     @reload zones
 
+    @statistics =
+      requests: `0n`
+
   reload: (zones) ->
     @zones = zones
 
@@ -208,6 +211,8 @@ class DNS
     @server.bind port or @port
 
   resolve: (req, res) ->
+    @statistics.requests++
+
     res.setHeader(req.header)
     for q in req.q
       res.addQuestion(q)
