@@ -4,9 +4,10 @@ configure = (cfg) ->
 
   zones = new Zones()
 
-  # Enumerate the domains listed in the database with a "records" field.
-  cfg.prov.query "#{couchapp.id}/domains", include_docs:true
-  .observe (rec) ->
+  debug 'Enumerate the domains listed in the database with a "records" field.'
+  await cfg.prov
+    .query "#{couchapp.id}/domains", include_docs:true
+    .observe (rec) ->
       doc = rec.doc
       return if not doc?
       if doc.ENUM
@@ -17,9 +18,10 @@ configure = (cfg) ->
       zones.add_zone zone
       return
 
-  # Add any other records (hosts, ..)
-  cfg.prov.query "#{couchapp.id}/names"
-  .observe (rec) ->
+  debug 'Add any other records (hosts, ..)'
+  await cfg.prov
+    .query "#{couchapp.id}/names"
+    .observe (rec) ->
       domain = rec.key
       return unless domain?
       zone = zones.get_zone(domain) ? zones.add_zone new Zone domain, {}
@@ -40,6 +42,7 @@ configure = (cfg) ->
 couchapp = require './couchapp'
 
 install = (db) ->
+  debug 'Installing application in database'
   {_rev} = await db.get(couchapp._id).catch -> {}
   couchapp._rev = _rev if _rev?
   await db.put couchapp
@@ -64,7 +67,7 @@ main = ->
 
   cfg.server.listen process.env.DNS_PORT ? 53
 
-  # Start monitoring changes
+  debug 'Start monitoring changes'
   cfg.prov.changes
     live: true
     include_docs: true
@@ -76,7 +79,7 @@ main = ->
     console.error error
     Promise.reject error
 
-  # Initial configuration
+  debug 'Initial configuration'
   await configure cfg
   return
 
@@ -91,6 +94,9 @@ CouchDB = require 'most-couchdb'
 
 module.exports = {configure,main,install,get_serial}
 if require.main is module
-  main().catch (error) ->
+  main()
+  .then ->
+    debug 'Started'
+  .catch (error) ->
     console.log error
     Promise.reject error
