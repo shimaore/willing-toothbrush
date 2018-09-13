@@ -35,8 +35,8 @@ configure = (cfg) ->
 couchapp = require './couchapp'
 
 install = (db) ->
-  {_rev} = await db.get couchapp._id
-  couchapp._rev = _rev
+  {_rev} = await db.get(couchapp._id).catch -> {}
+  couchapp._rev = _rev if _rev?
   await db.put couchapp
 
 get_serial = ->
