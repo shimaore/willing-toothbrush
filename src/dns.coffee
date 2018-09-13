@@ -161,11 +161,11 @@ class Response
 
   commit: (req, res) ->
     res.setHeader {
-      id: req.id
-      qr: 1
-      ra: 0
-      rd: 1
-      aa: 1
+      id: req.header.id
+      qr: 1 # response
+      ra: 0 # recursion available
+      rd: 0 # recursion desired
+      aa: 1 # authoritative
       qdcount: req.q.length
       ancount: @answer.length
       nscount: @authoritative.length
