@@ -86,6 +86,4 @@ CouchDB = require 'most-couchdb'
 
 module.exports = {configure,main,install,get_serial}
 if require.main is module
-  main().catch (error) ->
-    console.error error
-    Promise.reject error
+  main()
