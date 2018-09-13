@@ -167,14 +167,14 @@ class Response
     nscount = @authoritative.length
     arcount = @additional.length
 
-    res.id = req.id
+    res.header.id = req.id
     for key, val of { qr: 1, ra: 0, rd: 1, aa: 1, ancount, nscount, arcount }
       res.header[key] = val
 
     for record in [@answer..., @authoritative..., @additional...]
       value = if isArray(record.value) then record.value else record.value.split " "
       res.addRR record.name, record.ttl, "IN", record.class, value...
-    @
+    return
 
 exports.Zones = class Zones
 
