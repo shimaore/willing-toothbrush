@@ -46,176 +46,176 @@ function enumeration (obj) {
 
 var ns_sect = enumeration({
   'ns_s_qd': 0,	// Query: Question.
-    'ns_s_zn': 0,	// Update: Zone.
-    'ns_s_an': 1,	// Query: Answer.
-    'ns_s_pr': 1,	// Update: Prerequisites.
-    'ns_s_ns': 2,	// Query: Name servers.
-    'ns_s_ud': 2,	// Query: Update.
-    'ns_s_ar': 3,	// Query|Update: Additional records.
-    'ns_s_max': 4,
+  'ns_s_zn': 0,	// Update: Zone.
+  'ns_s_an': 1,	// Query: Answer.
+  'ns_s_pr': 1,	// Update: Prerequisites.
+  'ns_s_ns': 2,	// Query: Name servers.
+  'ns_s_ud': 2,	// Query: Update.
+  'ns_s_ar': 3,	// Query|Update: Additional records.
+  'ns_s_max': 4,
 });
 
 var ns_flag = enumeration({
   'ns_f_qr': 0,	// Question/Response.
-    'ns_f_opcode': 1,	// Operation code.
-    'ns_f_aa': 2,	// Authorative Answer.
-    'ns_f_tc': 3,	// Truncation occured.
-    'ns_f_rd': 4,	// Recursion Desired.
-    'ns_f_ra': 5,	// Recursion Available.
-    'ns_f_z': 6,	// MBZ
-    'ns_f_ad': 7,	// Authentic Data (DNSSEC)
-    'ns_f_cd': 8,	// Checking Disabled (DNSSEC)
-    'ns_f_rcode': 9,	// Response code.
-    'ns_f_max': 10,
+  'ns_f_opcode': 1,	// Operation code.
+  'ns_f_aa': 2,	// Authorative Answer.
+  'ns_f_tc': 3,	// Truncation occured.
+  'ns_f_rd': 4,	// Recursion Desired.
+  'ns_f_ra': 5,	// Recursion Available.
+  'ns_f_z': 6,	// MBZ
+  'ns_f_ad': 7,	// Authentic Data (DNSSEC)
+  'ns_f_cd': 8,	// Checking Disabled (DNSSEC)
+  'ns_f_rcode': 9,	// Response code.
+  'ns_f_max': 10,
 });
 
 // Currently defined opcodes.
 var ns_opcode = enumeration({
   'ns_o_query': 0, 	// Standard query.
-    'ns_o_iquery': 1,	// Inverse query (deprecated/unsupported).
-    'ns_o_status': 2, 	// Name server status query (unsupported).
-    // Opcode 3 is undefined/reserved
-    'ns_o_notify': 4,	// Zone change notification.
-    'ns_o_update': 5,	// Zone update message.
+  'ns_o_iquery': 1,	// Inverse query (deprecated/unsupported).
+  'ns_o_status': 2, 	// Name server status query (unsupported).
+  // Opcode 3 is undefined/reserved
+  'ns_o_notify': 4,	// Zone change notification.
+  'ns_o_update': 5,	// Zone update message.
 });
 
 // Currently defined response codes
 var ns_rcode = enumeration({
   'ns_r_noerror': 0,	// No error occured.
-    'ns_r_formerr': 1,	// Format error.
-    'ns_r_servfail': 2,	// Server failure.
-    'ns_r_nxdomain': 3,	// Name error.
-    'ns_r_notimpl': 4,	// Unimplemented.
-    'ns_r_refused': 5,	// Operation refused.
-    // These are for BIND_UPDATE
-    'ns_r_yxdomain': 6,	// Name exists
-    'ns_r_yxrrset': 7,	// RRset exists
-    'ns_r_nxrrset': 8,	// RRset does not exist
-    'ns_r_notauth': 9,	// Not authoritative for zone
-    'ns_r_notzone': 10,	// Zone of record different from zone section
-    'ns_r_max': 11,
-    // The following are EDNS extended rcodes
-    'ns_r_badvers': 16,
-    // The following are TSIG errors
-    'ns_r_badsig': 16,
-    'ns_r_badkey': 17,
-    'ns_r_badtime': 18,
+  'ns_r_formerr': 1,	// Format error.
+  'ns_r_servfail': 2,	// Server failure.
+  'ns_r_nxdomain': 3,	// Name error.
+  'ns_r_notimpl': 4,	// Unimplemented.
+  'ns_r_refused': 5,	// Operation refused.
+  // These are for BIND_UPDATE
+  'ns_r_yxdomain': 6,	// Name exists
+  'ns_r_yxrrset': 7,	// RRset exists
+  'ns_r_nxrrset': 8,	// RRset does not exist
+  'ns_r_notauth': 9,	// Not authoritative for zone
+  'ns_r_notzone': 10,	// Zone of record different from zone section
+  'ns_r_max': 11,
+  // The following are EDNS extended rcodes
+  'ns_r_badvers': 16,
+  // The following are TSIG errors
+  'ns_r_badsig': 16,
+  'ns_r_badkey': 17,
+  'ns_r_badtime': 18,
 });
 
 // BIND_UPDATE
 var ns_update_operation = enumeration({
   'ns_oup_delete': 0,
-    'ns_oup_add': 1,
-    'ns_oup_max': 2,
+  'ns_oup_add': 1,
+  'ns_oup_max': 2,
 });
 
 var NS_TSIG = enumeration({
   'NS_TSIG_FUDGE': 300,
-    'NS_TSIG_TCP_COUNT': 100,
-    'NS_TSIG_ALG_HMAC_MD5': "HMAC-MD5.SIG-ALG.REG.INT",
+  'NS_TSIG_TCP_COUNT': 100,
+  'NS_TSIG_ALG_HMAC_MD5': "HMAC-MD5.SIG-ALG.REG.INT",
 
-    'NS_TSIG_ERROR_NO_TSIG': -10,
-    'NS_TSIG_ERROR_NO_SPACE': -11,
-    'NS_TSIG_ERROR_FORMERR': -12,
+  'NS_TSIG_ERROR_NO_TSIG': -10,
+  'NS_TSIG_ERROR_NO_SPACE': -11,
+  'NS_TSIG_ERROR_FORMERR': -12,
 });
 
 // Currently defined type values for resources and queries.
 var ns_type = enumeration({
   'ns_t_invalid': 0,	// Cookie.
-    'ns_t_a': 1,	// Host address.
-    'ns_t_ns': 2,	// Authoritative server.
-    'ns_t_md': 3,	// Mail destination.
-    'ns_t_mf': 4,	// Mail forwarder.
-    'ns_t_cname': 5,	// Canonical name.
-    'ns_t_soa': 6,	// Start of authority zone.
-    'ns_t_mb': 7,	// Mailbox domain name.
-    'ns_t_mg': 8,	// Mail group member.
-    'ns_t_mr': 9,	// Mail rename name.
-    'ns_t_null': 10,	// Null resource record.
-    'ns_t_wks': 11,	// Well known service.
-    'ns_t_ptr': 12,	// Domain name pointer.
-    'ns_t_hinfo': 13,	// Host information.
-    'ns_t_minfo': 14,	// Mailbox information.
-    'ns_t_mx': 15,	// Mail routing information.
-    'ns_t_txt': 16,	// Text strings.
-    'ns_t_rp': 17,	// Responsible person.
-    'ns_t_afsdb': 18,	// AFS cell database.
-    'ns_t_x25': 19,	// X_25 calling address.
-    'ns_t_isdn': 20,	// ISDN calling address.
-    'ns_t_rt': 21,	// Router.
-    'ns_t_nsap': 22,	// NSAP address.
-    'ns_t_ns_nsap_ptr': 23,	// Reverse NSAP lookup (deprecated)
-    'ns_t_sig': 24,	// Security signature.
-    'ns_t_key': 25,	// Security key.
-    'ns_t_px': 26,	// X.400 mail mapping.
-    'ns_t_gpos': 27,	// Geographical position (withdrawn).
-    'ns_t_aaaa': 28,	// Ip6 Address.
-    'ns_t_loc': 29,	// Location Information.
-    'ns_t_nxt': 30,	// Next domain (security)
-    'ns_t_eid': 31,	// Endpoint identifier.
-    'ns_t_nimloc': 32,	// Nimrod Locator.
-    'ns_t_srv': 33,	// Server Selection.
-    'ns_t_atma': 34,	// ATM Address
-    'ns_t_naptr': 35,	// Naming Authority PoinTeR
-    'ns_t_kx': 36,	// Key Exchange
-    'ns_t_cert': 37,	// Certification Record
-    'ns_t_a6': 38,	// IPv6 Address (deprecated, use ns_t_aaaa)
-    'ns_t_dname': 39,	// Non-terminal DNAME (for IPv6)
-    'ns_t_sink': 40,	// Kitchen sink (experimental)
-    'ns_t_opt': 41,	// EDNS0 option (meta-RR)
-    'ns_t_apl': 42,	// Address prefix list (RFC3123)
-    'ns_t_ds': 43,	// Delegation Signer
-    'ns_t_sshfp': 44,	// SSH Fingerprint
-    'ns_t_ipseckey': 45,// IPSEC Key
-    'ns_t_rrsig': 46,	// RRSet Signature
-    'ns_t_nsec': 47,	// Negative Security
-    'ns_t_dnskey': 48,	// DNS Key
-    'ns_t_dhcid': 49,	// Dynamic host configuartion identifier
-    'ns_t_nsec3': 50,	// Negative security type 3
-    'ns_t_nsec3param': 51,	// Negative security type 3 parameters
-    'ns_t_hip': 55,	// Host Identity Protocol
-    'ns_t_spf': 99,	// Sender Policy Framework
-    'ns_t_tkey': 249,	// Transaction key
-    'ns_t_tsig': 250,	// Transaction signature.
-    'ns_t_ixfr': 251,	// Incremental zone transfer.
-    'ns_t_axfr': 252,	// Transfer zone of authority.
-    'ns_t_mailb': 253,	// Transfer mailbox records.
-    'ns_t_maila': 254,	// Transfer mail agent records.
-    'ns_t_any': 255,	// Wildcard match.
-    'ns_t_zxfr': 256,	// BIND-specific, nonstandard.
-    'ns_t_dlv': 32769,	// DNSSEC look-aside validation.
-    'ns_t_max': 65536
+  'ns_t_a': 1,	// Host address.
+  'ns_t_ns': 2,	// Authoritative server.
+  'ns_t_md': 3,	// Mail destination.
+  'ns_t_mf': 4,	// Mail forwarder.
+  'ns_t_cname': 5,	// Canonical name.
+  'ns_t_soa': 6,	// Start of authority zone.
+  'ns_t_mb': 7,	// Mailbox domain name.
+  'ns_t_mg': 8,	// Mail group member.
+  'ns_t_mr': 9,	// Mail rename name.
+  'ns_t_null': 10,	// Null resource record.
+  'ns_t_wks': 11,	// Well known service.
+  'ns_t_ptr': 12,	// Domain name pointer.
+  'ns_t_hinfo': 13,	// Host information.
+  'ns_t_minfo': 14,	// Mailbox information.
+  'ns_t_mx': 15,	// Mail routing information.
+  'ns_t_txt': 16,	// Text strings.
+  'ns_t_rp': 17,	// Responsible person.
+  'ns_t_afsdb': 18,	// AFS cell database.
+  'ns_t_x25': 19,	// X_25 calling address.
+  'ns_t_isdn': 20,	// ISDN calling address.
+  'ns_t_rt': 21,	// Router.
+  'ns_t_nsap': 22,	// NSAP address.
+  'ns_t_ns_nsap_ptr': 23,	// Reverse NSAP lookup (deprecated)
+  'ns_t_sig': 24,	// Security signature.
+  'ns_t_key': 25,	// Security key.
+  'ns_t_px': 26,	// X.400 mail mapping.
+  'ns_t_gpos': 27,	// Geographical position (withdrawn).
+  'ns_t_aaaa': 28,	// Ip6 Address.
+  'ns_t_loc': 29,	// Location Information.
+  'ns_t_nxt': 30,	// Next domain (security)
+  'ns_t_eid': 31,	// Endpoint identifier.
+  'ns_t_nimloc': 32,	// Nimrod Locator.
+  'ns_t_srv': 33,	// Server Selection.
+  'ns_t_atma': 34,	// ATM Address
+  'ns_t_naptr': 35,	// Naming Authority PoinTeR
+  'ns_t_kx': 36,	// Key Exchange
+  'ns_t_cert': 37,	// Certification Record
+  'ns_t_a6': 38,	// IPv6 Address (deprecated, use ns_t_aaaa)
+  'ns_t_dname': 39,	// Non-terminal DNAME (for IPv6)
+  'ns_t_sink': 40,	// Kitchen sink (experimental)
+  'ns_t_opt': 41,	// EDNS0 option (meta-RR)
+  'ns_t_apl': 42,	// Address prefix list (RFC3123)
+  'ns_t_ds': 43,	// Delegation Signer
+  'ns_t_sshfp': 44,	// SSH Fingerprint
+  'ns_t_ipseckey': 45,// IPSEC Key
+  'ns_t_rrsig': 46,	// RRSet Signature
+  'ns_t_nsec': 47,	// Negative Security
+  'ns_t_dnskey': 48,	// DNS Key
+  'ns_t_dhcid': 49,	// Dynamic host configuartion identifier
+  'ns_t_nsec3': 50,	// Negative security type 3
+  'ns_t_nsec3param': 51,	// Negative security type 3 parameters
+  'ns_t_hip': 55,	// Host Identity Protocol
+  'ns_t_spf': 99,	// Sender Policy Framework
+  'ns_t_tkey': 249,	// Transaction key
+  'ns_t_tsig': 250,	// Transaction signature.
+  'ns_t_ixfr': 251,	// Incremental zone transfer.
+  'ns_t_axfr': 252,	// Transfer zone of authority.
+  'ns_t_mailb': 253,	// Transfer mailbox records.
+  'ns_t_maila': 254,	// Transfer mail agent records.
+  'ns_t_any': 255,	// Wildcard match.
+  'ns_t_zxfr': 256,	// BIND-specific, nonstandard.
+  'ns_t_dlv': 32769,	// DNSSEC look-aside validation.
+  'ns_t_max': 65536
 });
 exports.ns_type = ns_type;
 
 // Values for class field
 var ns_class = enumeration({
   'ns_c_invalid':  0,	// Cookie.
-    'ns_c_in': 1,	// Internet.
-    'ns_c_2': 2,	// unallocated/unsupported.
-    'ns_c_chaos': 3,	// MIT Chaos-net.
-    'ns_c_hs': 4,	// MIT Hesoid.
-    // Query class values which do not appear in resource records
-    'ns_c_none': 254,	// for prereq. sections in update requests
-    'ns_c_any': 255,	// Wildcard match.
-    'ns_c_max': 65535,
+  'ns_c_in': 1,	// Internet.
+  'ns_c_2': 2,	// unallocated/unsupported.
+  'ns_c_chaos': 3,	// MIT Chaos-net.
+  'ns_c_hs': 4,	// MIT Hesoid.
+  // Query class values which do not appear in resource records
+  'ns_c_none': 254,	// for prereq. sections in update requests
+  'ns_c_any': 255,	// Wildcard match.
+  'ns_c_max': 65535,
 });
 exports.ns_class = ns_class;
 
 // DNSSEC constants.
 var ns_key_types = enumeration({
   'ns_kt_rsa': 1,	// key type RSA/MD5
-    'ns_kt_dh': 2,	// Diffie Hellman
-    'ns_kt_dsa': 3,	// Digital Signature Standard (MANDATORY)
-    'ns_kt_private': 4	// Private key type starts with OID
+  'ns_kt_dh': 2,	// Diffie Hellman
+  'ns_kt_dsa': 3,	// Digital Signature Standard (MANDATORY)
+  'ns_kt_private': 4	// Private key type starts with OID
 });
 
 var ns_cert_type = enumeration({
   'cert_t_pkix': 1,	// PKIX (X.509v3)
-    'cert_t_spki': 2,	// SPKI
-    'cert_t_pgp': 3, 	// PGP
-    'cert_t_url': 253,	// URL private type
-    'cert_t_oid': 254	// OID private type
+  'cert_t_spki': 2,	// SPKI
+  'cert_t_pgp': 3, 	// PGP
+  'cert_t_url': 253,	// URL private type
+  'cert_t_oid': 254	// OID private type
 });
 
 // Flags field of the KEY RR rdata
@@ -243,7 +243,7 @@ var digitvalue = [
   ];
 
 var hexvalue = [
-"00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "0a", "0b", "0c", "0d", "0e", "0f", 
+  "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "0a", "0b", "0c", "0d", "0e", "0f", 
   "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "1a", "1b", "1c", "1d", "1e", "1f", 
   "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "2a", "2b", "2c", "2d", "2e", "2f", 
   "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "3a", "3b", "3c", "3d", "3e", "3f", 
@@ -259,7 +259,7 @@ var hexvalue = [
   "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "d8", "d9", "da", "db", "dc", "dd", "de", "df", 
   "e0", "e1", "e2", "e3", "e4", "e5", "e6", "e7", "e8", "e9", "ea", "eb", "ec", "ed", "ee", "ef", 
   "f0", "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "fa", "fb", "fc", "fd", "fe", "ff", 
-  ];
+];
 
 var digits = "0123456789";
 var ns_flagdata = [
@@ -282,7 +282,7 @@ var ns_flagdata = [
   ];
 
 var res_opcodes = [
-"QUERY",
+  "QUERY",
   "IQUERY",
   "CQUERYM",
   "CQUERYU",	// experimental
@@ -298,13 +298,13 @@ var res_opcodes = [
   "13",
   "ZONEINIT",
   "ZONEREF",
-  ];
+];
 var res_sectioncodes = [
-"ZONE",
+  "ZONE",
   "PREREQUISITES",
   "UPDATE",
   "ADDITIONAL",
-  ];
+];
 
 var p_class_syms = {
   1: "IN",
@@ -1873,7 +1873,7 @@ DNSWriter.prototype.endRdata = function () {
 
   var rdlength = this.writeStart - this.rdstart;
   debug (rdlength)
-    this.buf[this.rdstart-2] = (rdlength >> 8) & 0xff;
+  this.buf[this.rdstart-2] = (rdlength >> 8) & 0xff;
   this.buf[this.rdstart-1] = (rdlength) & 0xff;
 };
 
