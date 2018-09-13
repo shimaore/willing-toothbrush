@@ -221,9 +221,9 @@ class DNS
 
     response = new Response this
 
-    req.q.forEach (q) =>
-      name = q.name
-      type = q.typeName
+    if req.q.length > 0
+      name = req.q[0].name
+      type = req.q[0].typeName
       if zone = @zones?.find_zone name
         response.resolve name, type, zone
 
