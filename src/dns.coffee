@@ -162,16 +162,20 @@ class Response
     return
 
   commit: (req, res) ->
+    res.setHeader {
+      id: req.id
+      qr: 1
+      ra: 0
+      rd: 1
+      aa: 1
+      qdcount: req.q.length
+      ancount: @answer.length
+      nscount: @authoritative.length
+      arcount: @additional.length
+    }
+
     for q in req.q
       res.addQuestion(q)
-
-    ancount = @answer.length
-    nscount = @authoritative.length
-    arcount = @additional.length
-
-    res.header.id = req.id
-    for key, val of { qr: 1, ra: 0, rd: 1, aa: 1, ancount, nscount, arcount }
-      res.header[key] = val
 
     for record in [@answer..., @authoritative..., @additional...]
       value = if isArray(record.value) then record.value else record.value.split " "
@@ -223,9 +227,9 @@ class DNS
 
     response = new Response this
 
-    if req.q.length > 0
-      name = req.q[0].name
-      type = req.q[0].typeName
+    for q in req.q
+      name = q.name
+      type = q.typeName
       if zone = @zones?.find_zone name
         response.resolve name, type, zone
 
