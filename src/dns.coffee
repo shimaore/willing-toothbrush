@@ -62,7 +62,7 @@ exports.Zone = class Zone
     @admin = dotize(@admin)
 
   create_record: (record) ->
-    r = _.extend(_.clone(@record_defaults()), record)
+    r = Object.assign {}, @record_defaults(), record
     r.name = if r.prefix? then dotize(r.prefix) + @dot_domain else @dot_domain
     r
 
