@@ -14,6 +14,7 @@ configure = (cfg) ->
         debug 'Ignoring ENUM document', doc
         return
       else
+        debug 'new Zone', doc, cfg.serial
         zone = new Zone doc.domain, doc, cfg.serial
       zones.add_zone zone
       return
@@ -24,6 +25,7 @@ configure = (cfg) ->
     .observe (rec) ->
       domain = rec.key
       return unless domain?
+      debug 'add record', rec.value
       zone = zones.get_zone(domain) ? zones.add_zone new Zone domain, {}
       zone.add_record rec.value
       return
