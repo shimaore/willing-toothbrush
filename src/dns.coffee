@@ -69,14 +69,8 @@ exports.Zone = class Zone
   select_class: (type) ->
     @records.filter (record) -> record.class == type
 
-  find_class: (type) ->
-    @records.find (record) -> record.class == type
-
   select: (type, name) ->
     @records.filter (record) -> (record.class == type) and (record.name == name)
-
-  find: (type, name) ->
-    @records.find (record) -> (record.class == type) and (record.name == name)
 
 class Response
   constructor: (@server) ->
@@ -120,16 +114,16 @@ class Response
       return unless zone?
 
       zone
-      .find "A", name
+      .select "A", name
       .forEach (d) => @add_additional shuffle d
       zone
-      .find "AAAA", name
+      .select "AAAA", name
       .forEach (d) => @add_additional shuffle d
     return
 
   add_soa_to_authoritative: (zone) ->
     zone
-    .find_class "SOA"
+    .select_class "SOA"
     .forEach (d) => @add_authoritative d
 
   resolve: (name,type,zone) ->
