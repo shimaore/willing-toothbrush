@@ -5,10 +5,8 @@ configure = (cfg) ->
   zones = new Zones()
 
   # Enumerate the domains listed in the database with a "records" field.
-  {rows} = await cfg.prov.query "#{couchapp.id}/domains", include_docs:true
-
-  for rec in rows ? []
-    do (rec) ->
+  cfg.prov.query "#{couchapp.id}/domains", include_docs:true
+  .observe (rec) ->
       doc = rec.doc
       return if not doc?
       if doc.ENUM
@@ -17,16 +15,16 @@ configure = (cfg) ->
       else
         zone = new Zone doc.domain, doc, cfg.serial
       zones.add_zone zone
+      return
 
   # Add any other records (hosts, ..)
-  {rows} = await cfg.prov.query "#{couchapp.id}/names"
-
-  for rec in rows ? []
-    do (rec) ->
+  cfg.prov.query "#{couchapp.id}/names"
+  .observe (rec) ->
       domain = rec.key
       return unless domain?
       zone = zones.get_zone(domain) ? zones.add_zone new Zone domain, {}
       zone.add_record rec.value
+      return
 
   new_serial = get_serial()
   if new_serial > cfg.serial
@@ -42,7 +40,9 @@ configure = (cfg) ->
 couchapp = require './couchapp'
 
 install = (db) ->
-  await update db, couchapp
+  {_rev} = await db.get couchapp._id
+  couchapp._rev = _rev
+  await db.put couchapp
 
 get_serial = ->
   now = new Date()
@@ -54,7 +54,7 @@ main = ->
   cfg = {}
 
   assert process.env.DNS_PREFIX_ADMIN?, 'Please provide DNS_PREFIX_ADMIN'
-  cfg.prov = new PouchDB process.env.DNS_PREFIX_ADMIN
+  cfg.prov = new CouchDB process.env.DNS_PREFIX_ADMIN
   cfg.serial = "#{get_serial()}"
   cfg.web_port = process.env.DNS_WEB_PORT
 
@@ -64,22 +64,17 @@ main = ->
 
   cfg.server.listen process.env.DNS_PORT ? 53
 
-  monitor = ->
-    changes = cfg.prov.changes
-      live: true
-      include_docs: true
-      filter: "#{couchapp.id}/changes"
-      since: 'now'
-
-    changes.on 'change', ->
-      configure cfg
-
-    changes.on 'error', (err) ->
-      debug "Changes error: #{err}"
-      monitor()
-
   # Start monitoring changes
-  monitor()
+  cfg.prov.changes
+    live: true
+    include_docs: true
+    selector: $or: [ {type:'domain'}, {type:'host'} ]
+    since: 'now'
+  .observe ->
+    configure cfg
+  .catch (error) ->
+    console.error error
+    Promise.reject error
 
   # Initial configuration
   configure cfg
@@ -92,10 +87,10 @@ Zones = dns.Zones
 pkg = require './package.json'
 debug = (require 'debug') pkg.name
 assert = require 'assert'
-PouchDB = require 'ccnq4-pouchdb'
-update = require 'nimble-direction/update'
-Zappa = require 'zappajs'
+CouchDB = require 'most-couchdb'
 
 module.exports = {configure,main,install,get_serial}
 if require.main is module
-  main()
+  main().catch (error) ->
+    console.error error
+    Promise.reject error
