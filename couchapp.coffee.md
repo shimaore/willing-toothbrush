@@ -8,19 +8,10 @@
       version: pkg.version
       language: 'javascript'
       views: {}
-      filters: {}
 
     module.exports = ddoc
 
     {p_fun} = require 'coffeescript-helpers'
-
-`changes` filter
-----------------
-
-Remember to update this filter if new doc.type's are handled by the views.
-
-    ddoc.filters.changes = p_fun (doc,req) ->
-        return doc.type? and (doc.type is 'domain' or doc.type is 'host')
 
 `domains` view
 --------------
