@@ -1374,11 +1374,11 @@ DNSParser.prototype.skipRR = function (cb) {
   this.parseStart = this.parseEnd;
 };
 
-DNSParser.prototype._cdname = new Buffer(ns_maxcdname);
+DNSParser.prototype._cdname = Buffer.alloc(ns_maxcdname);
 
-DNSParser.prototype._dname = new Buffer(ns_maxdname);
+DNSParser.prototype._dname = Buffer.alloc(ns_maxdname);
 
-DNSParser.prototype._string = new Buffer(ns_maxdname);
+DNSParser.prototype._string = Buffer.alloc(ns_maxdname);
 
 DNSParser.prototype.parseName = function () {
   var n, len;
@@ -1479,7 +1479,7 @@ DNSParser.prototype.parseEDNS = function () {
 DNSParser.prototype.parseRRSIGSigner = function () { // kinda like unpack of a name, but without compression
   //	debug ('DNSParser.prototype.parseRRSIGSigner');
 
-  var name = new Buffer(ns_maxdname);
+  var name = Buffer.alloc(ns_maxdname);
   var start = 0;
 
   var signamelen = this.parseUInt8 ();
@@ -1533,12 +1533,12 @@ DNSParser.prototype.parseRRSIG = function (rrsig) {
 
   var signerLength = this.parseStart-beforeSigner;
 
-  var signame = new Buffer (signerLength);
+  var signame = Buffer.alloc(signerLength);
   this.buf.copy (signame, 0, beforeSigner, beforeSigner+signerLength);
 
   var len = this.parseEnd - this.parseStart;
 
-  var signature = new Buffer (len);
+  var signature = Buffer.alloc(len);
 
   this.buf.copy (signature, 0, this.parseStart, this.parseStart+len);
 
@@ -1635,7 +1635,7 @@ DNSParser.prototype.parseDS = function (ds) {
   debug ('len');
   debug (len);
 
-  var signature = new Buffer (len);
+  var signature = Buffer.alloc(len);
 
   this.buf.copy (signature, 0, this.parseStart, this.parseStart+len);
   ds.signature = signature;
@@ -1891,9 +1891,9 @@ DNSWriter.prototype.endTruncate = function () {
   this.writeStart = this.trstart;
 };
 
-DNSWriter.prototype._cdname = new Buffer(ns_maxcdname);
+DNSWriter.prototype._cdname = Buffer.alloc(ns_maxcdname);
 
-DNSWriter.prototype._dname = new Buffer(ns_maxdname);
+DNSWriter.prototype._dname = Buffer.alloc(ns_maxdname);
 
 DNSWriter.prototype.writeNameBuffer = function (name) {
   if (this.truncated)
@@ -1922,7 +1922,7 @@ DNSWriter.prototype.writeNameBuffer = function (name) {
   this.writeStart += n;
 };
 
-DNSWriter.prototype._string = new Buffer(ns_maxdname);
+DNSWriter.prototype._string = Buffer.alloc(ns_maxdname);
 
 DNSWriter.prototype.writeNameString = function (name) {
   if (this.truncated)
@@ -2374,7 +2374,7 @@ function OutgoingMessage (socket, rinfo) {
 util.inherits(OutgoingMessage, Message);
 exports.OutgoingMessage = OutgoingMessage;
 
-OutgoingMessage.prototype._Buffer = new Buffer(ns_maxmsg);
+OutgoingMessage.prototype._Buffer = Buffer.alloc(ns_maxmsg);
 
 OutgoingMessage.prototype._Writer = new DNSWriter();
 
