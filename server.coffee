@@ -81,7 +81,7 @@ main = ->
 
   debug 'Initial configuration'
   await configure cfg
-  return
+  return cfg.server.statistics
 
 dns = require "./src/dns"
 Zone = dns.Zone
@@ -96,10 +96,10 @@ module.exports = {configure,main,install,get_serial}
 if require.main is module
   debug 'Starting'
   main()
-  .then ->
+  .then (statistics) ->
     debug 'Started'
     setInterval ->
-      debug 'Requests', cfg.server.statistics.requests.toString(10)
+      debug 'Requests', statistics.requests.toString(10)
     , 30*1000
   .catch (error) ->
     console.log error
