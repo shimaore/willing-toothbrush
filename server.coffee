@@ -53,7 +53,7 @@ main = ->
   cfg.serial = "#{get_serial()}"
   cfg.web_port = process.env.DNS_WEB_PORT
 
-  install cfg.prov
+  await install cfg.prov
 
   cfg.server = dns.createServer {}
 
@@ -72,7 +72,7 @@ main = ->
     Promise.reject error
 
   # Initial configuration
-  configure cfg
+  await configure cfg
   return
 
 dns = require "./src/dns"
@@ -86,4 +86,6 @@ CouchDB = require 'most-couchdb'
 
 module.exports = {configure,main,install,get_serial}
 if require.main is module
-  main()
+  main().catch (error) ->
+    console.log error
+    Promise.reject error
