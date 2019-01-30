@@ -28,9 +28,14 @@ configure = (cfg) ->
       zone = zones.get_zone(domain) ? zones.add_zone new Zone domain, {}
       zone.add_record rec.value
 
+  new_serial = get_serial()
+  if new_serial > cfg.serial
+    cfg.serial = new_serial
+  else
+    cfg.serial++
+
   debug 'Reload zones', serial: cfg.serial
   cfg.server.reload zones
-  cfg.serial++
 
   return
 
