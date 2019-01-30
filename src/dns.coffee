@@ -69,9 +69,11 @@ exports.Zone = class Zone
     cb _(@records).find (record) -> record.class == type
 
   select: (type, name, cb) ->
+    name = name.toLowerCase()
     cb _(@records).filter (record) -> (record.class == type) and (record.name == name)
 
   find: (type, name, cb) ->
+    name = name.toLowerCase()
     cb _(@records).find (record) -> (record.class == type) and (record.name == name)
 
 class Response
@@ -178,7 +180,7 @@ exports.Zones = class Zones
     @zones[zone.dot_domain] = zone
 
   find_zone: (domain) ->
-    domain = dotize domain
+    domain = dotize domain.toLowerCase()
     if @zones[domain]?
       return @zones[domain]
     else
