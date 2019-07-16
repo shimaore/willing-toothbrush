@@ -210,8 +210,6 @@ class DNS
       requests: `0n`
 
   reload: (zones) ->
-    unless zones?.find_zone?
-      throw new Error 'Invalid zones', zones
     @__zones = zones
 
   listen: (port) ->

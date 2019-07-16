@@ -101,7 +101,7 @@ main = ->
 {Zone,Zones} = dns = require "./src/dns"
 
 pkg = require './package.json'
-debug = (require 'debug') pkg.name
+debug = (require 'tangible') pkg.name
 assert = require 'assert'
 CouchDB = require 'most-couchdb/with-update'
 
