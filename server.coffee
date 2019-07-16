@@ -14,7 +14,7 @@ configure = (cfg) ->
         debug 'Ignoring ENUM document', doc
         return
       else
-        debug 'new Zone', doc, cfg.serial
+        debug 'new Zone', cfg.serial, JSON.stringify doc
         zone = new Zone doc.domain, doc, cfg.serial
       zones.add_zone zone
       return
