@@ -139,6 +139,7 @@ class Response
       return
 
     # No CNAME, lookup record
+    empty = true
     zone
     .select type, name
     .forEach (d) =>
@@ -148,9 +149,11 @@ class Response
         if type isnt "NS"
           @add_ns_records zone
         @add_additionals()
-      else
-        # empty response, SOA in authoritative section
-        @add_soa_to_authoritative zone
+        empty = false
+
+    if empty
+      # empty response, SOA in authoritative section
+      @add_soa_to_authoritative zone
     return
 
   commit: (req, res) ->
