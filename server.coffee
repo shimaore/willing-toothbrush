@@ -73,7 +73,7 @@ main = ->
   cfg.prov.changes
     live: true
     include_docs: true
-    selector: $or: [ {type:'domain'}, {type:'host'} ]
+    selector: $or: [ {type:'domain'}, {type:'host'} ] # only on CouchDB2
     since: 'now'
   .observe ->
     configure cfg
