@@ -5,14 +5,7 @@
 
 var util = require ('util');
 
-var debug;
-var debugLevel = parseInt(process.env.NODE_DEBUG, 16);
-if(debugLevel & 0x4) {
-  debug = function (x) { util.error('NDNS: ' + x); };
-  debug ('debug enabled');
-} else {
-  debug = function () { };
-}
+var debug = require('tangible')('willing-toothbrush:ndns')
 
 var dgram = require('dgram');
 var events = require('events');
