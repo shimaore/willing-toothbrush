@@ -45,9 +45,7 @@ couchapp = require './couchapp'
 
 install = (db) ->
   debug 'Installing application in database'
-  {_rev} = await db.get(couchapp._id).catch -> {}
-  couchapp._rev = _rev if _rev?
-  await db.put couchapp
+  await db.update couchapp
 
 get_serial = ->
   now = new Date()
@@ -56,6 +54,7 @@ get_serial = ->
   date*100+seq
 
 main = ->
+  debug 'Main'
   cfg = {}
 
   assert process.env.DNS_PREFIX_ADMIN?, 'Please provide DNS_PREFIX_ADMIN'
@@ -65,6 +64,7 @@ main = ->
 
   await install cfg.prov
 
+  debug 'Create server'
   cfg.server = dns.createServer {}
 
   cfg.server.listen process.env.DNS_PORT ? 53
@@ -80,8 +80,8 @@ main = ->
   .observe ->
     configure cfg
   .catch (error) ->
-    console.error error
-    Promise.reject error
+    console.error 'Monitoring changes:', error
+    process.exit 1
 
   debug 'Initial configuration'
   await configure cfg
@@ -106,5 +106,5 @@ if require.main is module
       debug 'Requests', statistics.requests.toString(10)
     , 30*1000
   .catch (error) ->
-    console.log error
-    Promise.reject error
+    console.log 'Main failed', error
+    process.exit 1
