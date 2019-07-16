@@ -60,8 +60,8 @@ main = ->
 
   assert process.env.DNS_PREFIX_ADMIN?, 'Please provide DNS_PREFIX_ADMIN'
   cfg.prov = new CouchDB process.env.DNS_PREFIX_ADMIN
-  cfg.serial = "#{get_serial()}"
-  cfg.web_port = process.env.DNS_WEB_PORT
+  cfg.serial = get_serial()
+  cfg.web_port = parseInt process.env.DNS_WEB_PORT
 
   await install cfg.prov
 
@@ -113,12 +113,14 @@ CouchDB = require 'most-couchdb/with-update'
 module.exports = {configure,main,install,get_serial}
 if require.main is module
   debug 'Starting'
-  main()
-  .then ([statistics4,statistics6]) ->
-    debug 'Started'
-    setInterval ->
-      debug 'Requests', statistics4.requests.toString(10), statistics6.requests.toString(10)
-    , 30*1000
-  .catch (error) ->
-    console.error 'Main failed', error
-    process.exit 1
+  do ->
+    try
+      [statistics4,statistics6] = await main()
+      debug 'Started'
+      setInterval ->
+        debug 'Requests', statistics4.requests.toString(10), statistics6.requests.toString(10)
+      , 30*1000
+    catch error
+      console.error 'Main failed', error
+      process.exit 1
+    return
