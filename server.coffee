@@ -25,7 +25,7 @@ configure = (cfg) ->
     .observe (rec) ->
       domain = rec.key
       return unless domain?
-      debug 'add record', rec.value
+      debug 'add record', domain, JSON.stringify rec.value
       zone = zones.get_zone(domain) ? zones.add_zone new Zone domain, {}
       zone.add_record rec.value
       return
@@ -45,9 +45,7 @@ couchapp = require './couchapp'
 
 install = (db) ->
   debug 'Installing application in database'
-  {_rev} = await db.get(couchapp._id).catch -> {}
-  couchapp._rev = _rev if _rev?
-  await db.put couchapp
+  try await db.update couchapp
 
 get_serial = ->
   now = new Date()
@@ -56,6 +54,7 @@ get_serial = ->
   date*100+seq
 
 main = ->
+  debug 'Main'
   cfg = {}
 
   assert process.env.DNS_PREFIX_ADMIN?, 'Please provide DNS_PREFIX_ADMIN'
@@ -65,6 +64,7 @@ main = ->
 
   await install cfg.prov
 
+  debug 'Create server'
   cfg.server = dns.createServer {}
 
   cfg.server.listen process.env.DNS_PORT ? 53
@@ -77,11 +77,22 @@ main = ->
     since: 'now'
   .filter ({type}) ->
     type is 'domain' or type is 'host'
-  .observe ->
-    configure cfg
+  .observe ({_id}) ->
+    debug "Reconfiguring due to #{_id}"
+    do ->
+      try
+        await configure cfg
+      catch error
+        console.error "Reconfigure failed, will retry", error
+        try
+          await configure cfg
+        catch error
+          console.error "Configure failed (ignored)", error
+      return
+    return
   .catch (error) ->
-    console.error error
-    Promise.reject error
+    console.error 'Monitoring changes:', error
+    process.exit 1
 
   debug 'Initial configuration'
   await configure cfg
@@ -94,7 +105,7 @@ Zones = dns.Zones
 pkg = require './package.json'
 debug = (require 'debug') pkg.name
 assert = require 'assert'
-CouchDB = require 'most-couchdb'
+CouchDB = require 'most-couchdb/with-update'
 
 module.exports = {configure,main,install,get_serial}
 if require.main is module
@@ -106,5 +117,5 @@ if require.main is module
       debug 'Requests', statistics.requests.toString(10)
     , 30*1000
   .catch (error) ->
-    console.log error
-    Promise.reject error
+    console.error 'Main failed', error
+    process.exit 1
