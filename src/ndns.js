@@ -5,7 +5,7 @@
 
 var util = require ('util');
 
-var debug = require('tangible')('willing-toothbrush:ndns')
+var debug = require('tangible')('willing-toothbrush:ndns');
 
 var dgram = require('dgram');
 var events = require('events');

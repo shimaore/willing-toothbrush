@@ -3,7 +3,6 @@
 # with async loading
 # and other changes for ccnq3
 #
-dgram = require('dgram')
 ndns = require('./ndns')
 shuffle = require './shuffle'
 
@@ -202,7 +201,11 @@ class DNS
 
   constructor: (zones) ->
     @server = ndns.createServer('udp4')
-    @server.on 'request', @resolve.bind this
+    @server.on 'request', (req,res) =>
+      try
+        @resolve req, res
+      catch error
+        console.error 'resolve', error
     @port or= 53
     @reload zones
 
@@ -228,6 +231,7 @@ class DNS
 
     response.commit(req, res)
     res.send()
+    return
 
   close: ->
     @server.close()
