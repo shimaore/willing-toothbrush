@@ -37,7 +37,8 @@ configure = (cfg) ->
     cfg.serial++
 
   debug 'Reload zones', serial: cfg.serial
-  cfg.server.reload zones
+  cfg.server4.reload zones
+  cfg.server6.reload zones
 
   return
 
@@ -65,9 +66,13 @@ main = ->
   await install cfg.prov
 
   debug 'Create server'
-  cfg.server = dns.createServer new Zones()
+  cfg.server4 = dns.createServer 'udp4', new Zones()
+  cfg.server6 = dns.createServer 'udp6', new Zones()
 
-  cfg.server.listen process.env.DNS_PORT ? 53
+  port = parseInt process.env.DNS_PORT
+  port = 53 if isNaN port
+  cfg.server4.listen port
+  cfg.server6.listen port
 
   debug 'Start monitoring changes'
   cfg.prov.changes
@@ -96,7 +101,7 @@ main = ->
 
   debug 'Initial configuration'
   await configure cfg
-  return cfg.server.statistics
+  return [cfg.server4.statistics,cfg.server6.statistics]
 
 {Zone,Zones} = dns = require "./src/dns"
 
@@ -109,10 +114,10 @@ module.exports = {configure,main,install,get_serial}
 if require.main is module
   debug 'Starting'
   main()
-  .then (statistics) ->
+  .then ([statistics4,statistics6]) ->
     debug 'Started'
     setInterval ->
-      debug 'Requests', statistics.requests.toString(10)
+      debug 'Requests', statistics4.requests.toString(10), statistics6.requests.toString(10)
     , 30*1000
   .catch (error) ->
     console.error 'Main failed', error
