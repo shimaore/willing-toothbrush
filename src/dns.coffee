@@ -7,10 +7,10 @@ ndns = require('./ndns')
 shuffle = require './shuffle'
 
 dotize = (domain) ->
-  if domain[-1..] == "." then domain else domain + "."
+  if domain[-1..] is "." then domain else domain + "."
 
 undotize = (domain) ->
-  if domain[-1..] != "." then domain else domain[..-2]
+  if domain[-1..] isnt "." then domain else domain[..-2]
 
 {isArray} = Array
 
@@ -22,12 +22,12 @@ exports.Zone = class Zone
     @domain = undotize(domain)
     @dot_domain = dotize(domain)
     @set_options(options)
-    @records = (@create_record(record) for record in options.records or [])
+    @__records = (@create_record(record) for record in options.records or [])
     @select_class "SOA"
     .forEach (d) =>
       soa = @_soa()
       if d.length is 0
-        @records.push soa
+        @__records.push soa
         return
       d.value = soa.value
 
@@ -37,7 +37,7 @@ exports.Zone = class Zone
     {name: @dot_domain, @ttl, class: "SOA", value}
 
   add_record: (record) ->
-    @records.push @create_record record
+    @__records.push @create_record record
 
   defaults: ->
     soa: @dot_domain
@@ -66,11 +66,11 @@ exports.Zone = class Zone
     r
 
   select_class: (type) ->
-    @records.filter (record) -> record.class == type
+    @__records.filter (record) -> record.class is type
 
   select: (type, name) ->
     name = name.toLowerCase()
-    @records.filter (record) -> (record.class == type) and (record.name == name)
+    @__records.filter (record) -> (record.class is type) and (record.name is name)
 
 class Response
   constructor: (@server) ->
