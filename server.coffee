@@ -73,8 +73,10 @@ main = ->
   cfg.prov.changes
     live: true
     include_docs: true
-    selector: $or: [ {type:'domain'}, {type:'host'} ] # only on CouchDB2
+    # selector: $or: [ {type:'domain'}, {type:'host'} ] # only on CouchDB2?
     since: 'now'
+  .filter ({type}) ->
+    type is 'domain' or type is 'host'
   .observe ->
     configure cfg
   .catch (error) ->
