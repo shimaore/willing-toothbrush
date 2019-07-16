@@ -65,7 +65,7 @@ main = ->
   await install cfg.prov
 
   debug 'Create server'
-  cfg.server = dns.createServer {}
+  cfg.server = dns.createServer new Zones()
 
   cfg.server.listen process.env.DNS_PORT ? 53
 
@@ -73,7 +73,7 @@ main = ->
   cfg.prov.changes
     live: true
     include_docs: true
-    # selector: $or: [ {type:'domain'}, {type:'host'} ] # only on CouchDB2?
+    # selector: $or: [ {type:'domain'}, {type:'host'} ] # only on CouchDB2
     since: 'now'
   .filter ({type}) ->
     type is 'domain' or type is 'host'
@@ -98,9 +98,7 @@ main = ->
   await configure cfg
   return cfg.server.statistics
 
-dns = require "./src/dns"
-Zone = dns.Zone
-Zones = dns.Zones
+{Zone,Zones} = dns = require "./src/dns"
 
 pkg = require './package.json'
 debug = (require 'debug') pkg.name
