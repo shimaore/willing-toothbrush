@@ -109,7 +109,7 @@ class Response
       name = dotize record.value
       # Only do the resolution for explicit names (e.g. CNAME, NS)
       return unless typeof name is 'string'
-      zone = @server.zones?.find_zone name
+      zone = @server.find_zone name
       # Nothing to add if we don't know about that zone.
       return unless zone?
 
@@ -214,6 +214,9 @@ class DNS
 
   reload: (zones) ->
     @__zones = zones
+
+  find_zone: (zone) ->
+    @__zones?.find_zone zone
 
   listen: (port) ->
     @server.bind port or @port
