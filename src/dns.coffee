@@ -178,16 +178,16 @@ class Response
 exports.Zones = class Zones
 
   constructor: ->
-    @zones = {}
+    @__zones = {}
 
   # Explicit: add_zone returns the zone
   add_zone: (zone) ->
-    @zones[zone.dot_domain] = zone
+    @__zones[zone.dot_domain] = zone
 
   find_zone: (domain) ->
     domain = dotize domain.toLowerCase()
-    if @zones[domain]?
-      return @zones[domain]
+    if @__zones[domain]?
+      return @__zones[domain]
     else
       if domain is '.'
         return
@@ -196,7 +196,7 @@ exports.Zones = class Zones
 
   get_zone: (domain) ->
     domain = dotize domain
-    @zones[domain]
+    @__zones[domain]
 
 class DNS
 
@@ -210,7 +210,9 @@ class DNS
       requests: `0n`
 
   reload: (zones) ->
-    @zones = zones
+    unless zones?.find_zone?
+      throw new Error 'Invalid zones', zones
+    @__zones = zones
 
   listen: (port) ->
     @server.bind port or @port
@@ -223,7 +225,7 @@ class DNS
     for q in req.q
       name = q.name
       type = q.typeName
-      if zone = @zones?.find_zone name
+      if zone = @__zones?.find_zone name
         response.resolve name, type, zone
 
     response.commit(req, res)
@@ -232,7 +234,7 @@ class DNS
   close: ->
     @server.close()
 
-exports.createServer = (config...) ->
-  new DNS(config...)
+exports.createServer = (zones) ->
+  new DNS zones
 exports.dotize = dotize
 exports.undotize = undotize
