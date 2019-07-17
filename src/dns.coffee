@@ -99,9 +99,17 @@ class Response
 
   add_additionals: ->
     [@answer..., @authoritative...].forEach (record) =>
-      name = dotize record.value
-      # Only do the resolution for explicit names (e.g. CNAME, NS)
-      return unless typeof name is 'string'
+      switch
+        # Resolution for explicit names (CNAME, NS, …)
+        when 'string' is typeof record.value
+          name = record.value
+        # Resolution for SRV
+        when 'SRV' is record.class
+          name = record.value[3]
+        else
+          return
+
+      name = dotize name
       zone = @server.find_zone name
       # Nothing to add if we don't know about that zone.
       return unless zone?
