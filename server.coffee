@@ -89,13 +89,12 @@ main = ->
 
   cfg.prov.changes
     live: true
-    include_docs: true
     # selector: $or: [ {type:'domain'}, {type:'host'}, {type: 'number_domain' ] # only on CouchDB2
     since: 'now'
-  .filter ({type}) ->
-    type is 'domain' or type is 'host' or type is 'number_domain'
-  .observe ({_id}) ->
-    debug "Reconfiguring due to #{_id}"
+  .filter ({id}) ->
+    id.match /^(domain|host|number_domain):/
+  .observe ({id}) ->
+    debug "Reconfiguring due to #{id}"
     needs_reconfigure = true
     return
   .catch (error) ->
