@@ -2435,6 +2435,7 @@ ClientRequest.prototype.send = function (message) {
 };
 
 function Server(type, requestListener) {
+  debug("creating new "+type+" server");
   dgram.Socket.call(this, type);
 
   if(requestListener) {
