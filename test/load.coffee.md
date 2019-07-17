@@ -15,10 +15,6 @@
       it 'should be above 2015010100', ->
         get_serial().should.be.above 2015010100
 
-    describe 'undotize', ->
-      {undotize} = require '../src/dns'
-      (undotize 'a' ).should.eql 'a'
-      (undotize 'a.').should.eql 'a'
     describe 'dotize', ->
       {dotize} = require '../src/dns'
       (dotize 'a' ).should.eql 'a.'

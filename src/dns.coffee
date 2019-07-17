@@ -1,7 +1,7 @@
 #
 # Based on appload/dns
 # with async loading
-# and other changes for ccnq3
+# and other changes for ccnq4
 #
 ndns = require('./ndns')
 shuffle = require './shuffle'
@@ -10,10 +10,6 @@ dotize = (domain) ->
   domain = domain.toLowerCase()
   if domain[-1..] is "." then domain else domain + "."
 
-undotize = (domain) ->
-  domain = domain.toLowerCase()
-  if domain[-1..] isnt "." then domain else domain[..-2]
-
 {isArray} = Array
 
 isEmpty = (o) -> Object.entries(o).length is 0
@@ -21,58 +17,52 @@ isEmpty = (o) -> Object.entries(o).length is 0
 exports.Zone = class Zone
 
   constructor: (domain, options,@serial) ->
-    @domain = undotize(domain)
-    @dot_domain = dotize(domain)
+    @domain = dotize(domain)
     @set_options(options)
-    @__records = (@create_record(record) for record in options.records or [])
-    @select_class "SOA"
-    .forEach (d) =>
-      soa = @_soa()
-      if d.length is 0
-        @__records.push soa
-        return
-      d.value = soa.value
+    @__records = []
+    @add_record record for record in options.records ? []
+    @add_record @_soa()
     return
 
   _soa: ->
     keys = "soa admin serial refresh retry expire min_ttl"
     value = keys.split(" ").map((param) => @[param]).join(" ")
-    {name: @dot_domain, @ttl, class: "SOA", value}
+    {class: "SOA", value}
 
   add_record: (record) ->
     @__records.push @create_record record
 
   defaults: ->
-    soa: @dot_domain
+    soa: @domain         # FIXME should be DNS server
     ttl: 420
     refresh: 840         # refresh (30 minutes)
     retry: 900           # retry (15 minutes)
     expire: 1209600      # expire (2 weeks)
     min_ttl: 1200        # minimum TTL (20 minutes)
-    admin: "hostmaster.#{@domain}."
+    admin: "hostmaster.#{@domain}"
 
   record_defaults: ->
-    ttl: @ttl or @defaults().ttl
+    ttl: @ttl
     class: "A"
     value: ""
 
   set_options: (options) ->
     defaults = @defaults()
     for key, val of defaults
-      @[key] = options[key] or val
+      @[key] = options[key] ? val
 
     @admin = dotize(@admin)
 
   create_record: (record) ->
     r = Object.assign {}, @record_defaults(), record
-    r.name = if r.prefix? then dotize(r.prefix) + @dot_domain else @dot_domain
+    r.name = if r.prefix? then dotize(r.prefix) + @domain else @domain
     r
 
   select_class: (type) ->
     @__records.filter (record) -> record.class is type
 
   select: (type, name) ->
-    name = name.toLowerCase()
+    name = dotize name
     @__records.filter (record) -> (record.class is type) and (record.name is name)
 
 class Response
@@ -188,7 +178,7 @@ exports.Zones = class Zones
 
   # Explicit: add_zone returns the zone
   add_zone: (zone) ->
-    @__zones[zone.dot_domain] = zone
+    @__zones[zone.domain] = zone
 
   find_zone: (domain) ->
     domain = dotize domain
@@ -249,4 +239,3 @@ class DNS
 exports.createServer = (zones) ->
   new DNS zones
 exports.dotize = dotize
-exports.undotize = undotize
