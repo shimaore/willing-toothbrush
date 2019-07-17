@@ -5,9 +5,9 @@ configure = (cfg) ->
   zones = new Zones()
 
   debug 'Enumerate the domains listed in the database with a "records" field.'
-  S = cfg.prov.queryAsyncIterable couchapp.id, 'domains', include_docs:true
+  rows = cfg.prov.queryAsyncIterable couchapp.id, 'domains', include_docs:true
 
-  for await rec from S
+  for await rec from rows
     do (rec) ->
       doc = rec.doc
       return if not doc?
@@ -21,9 +21,9 @@ configure = (cfg) ->
       return
 
   debug 'Add any other records (hosts, ..)'
-  S = cfg.prov.queryAsyncIterable couchapp.id, 'names'
+  rows = cfg.prov.queryAsyncIterable couchapp.id, 'names'
 
-  for await rec from S
+  for await rec from rows
     do (rec) ->
       domain = rec.key
       return unless domain?
@@ -48,7 +48,11 @@ couchapp = require './couchapp'
 
 install = (db) ->
   debug 'Installing application in database'
-  try await db.update couchapp
+  try
+    await db.update couchapp
+    true
+  catch
+    false
 
 get_serial = ->
   now = new Date()
@@ -63,11 +67,15 @@ main = ->
   assert process.env.DNS_PREFIX_ADMIN?, 'Please provide DNS_PREFIX_ADMIN'
   cfg.prov = new CouchDB process.env.DNS_PREFIX_ADMIN
   cfg.serial = get_serial()
-  cfg.web_port = parseInt process.env.DNS_WEB_PORT
+
+  await install cfg.prov
 
   debug 'Create server'
   cfg.server4 = dns.createServer 'udp4', new Zones()
   cfg.server6 = dns.createServer 'udp6', new Zones()
+
+  debug 'Initial configuration'
+  await configure cfg
 
   port = parseInt process.env.DNS_PORT
   port = 53 if isNaN port
@@ -76,9 +84,9 @@ main = ->
   cfg.server6.port = port
   cfg.server6.listen()
 
-  await install cfg.prov
-
   debug 'Start monitoring changes'
+  needs_reconfigure = false
+
   cfg.prov.changes
     live: true
     include_docs: true
@@ -88,26 +96,22 @@ main = ->
     type is 'domain' or type is 'host'
   .observe ({_id}) ->
     debug "Reconfiguring due to #{_id}"
-    do ->
-      try
-        await configure cfg
-      catch error
-        console.error "Reconfigure failed, will retry", error
-        try
-          await configure cfg
-        catch error
-          console.error "Configure failed (ignored)", error
-      return
+    needs_reconfigure = true
     return
   .catch (error) ->
     console.error 'Monitoring changes:', error
     process.exit 1
 
-  debug 'Initial configuration'
-  try
-    await configure cfg
-  catch
-    await configure cfg
+  setInterval ->
+    do ->
+      try
+        return unless needs_reconfigure
+        await configure cfg
+        needs_reconfigure = false
+      catch error
+        console.error 'reconfigure', error
+  , 60*1000
+
   return [cfg.server4.statistics,cfg.server6.statistics]
 
 {Zone,Zones} = dns = require "./src/dns"

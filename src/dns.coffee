@@ -32,6 +32,7 @@ exports.Zone = class Zone
         @__records.push soa
         return
       d.value = soa.value
+    return
 
   _soa: ->
     keys = "soa admin serial refresh retry expire min_ttl"
