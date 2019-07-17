@@ -102,7 +102,10 @@ main = ->
     process.exit 1
 
   debug 'Initial configuration'
-  await configure cfg
+  try
+    await configure cfg
+  catch
+    await configure cfg
   return [cfg.server4.statistics,cfg.server6.statistics]
 
 {Zone,Zones} = dns = require "./src/dns"
