@@ -202,8 +202,8 @@ exports.Zones = class Zones
 
 class DNS
 
-  constructor: (zones) ->
-    @server = ndns.createServer('udp4')
+  constructor: (type,zones) ->
+    @server = ndns.createServer(type)
     @server.on 'request', (req,res) =>
       try
         @resolve req, res
