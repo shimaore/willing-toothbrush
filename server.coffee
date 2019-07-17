@@ -89,10 +89,10 @@ main = ->
 
   cfg.prov.changes
     live: true
-    # selector: $or: [ {type:'domain'}, {type:'host'}, {type: 'number_domain' ] # only on CouchDB2
+    # selector: $or: [ {type:'domain'}, {type:'host'} ] # only on CouchDB2
     since: 'now'
   .filter ({id}) ->
-    id.match /^(domain|host|number_domain):/
+    id.match /^(domain|host):/
   .observe ({id}) ->
     debug "Reconfiguring due to #{id}"
     needs_reconfigure = true
