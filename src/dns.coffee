@@ -7,9 +7,11 @@ ndns = require('./ndns')
 shuffle = require './shuffle'
 
 dotize = (domain) ->
+  domain = domain.toLowerCase()
   if domain[-1..] is "." then domain else domain + "."
 
 undotize = (domain) ->
+  domain = domain.toLowerCase()
   if domain[-1..] isnt "." then domain else domain[..-2]
 
 {isArray} = Array
@@ -188,14 +190,14 @@ exports.Zones = class Zones
     @__zones[zone.dot_domain] = zone
 
   find_zone: (domain) ->
-    domain = dotize domain.toLowerCase()
+    domain = dotize domain
     if @__zones[domain]?
       return @__zones[domain]
     else
       if domain is '.'
         return
       else
-        return @find_zone domain.split(".")[1...].join(".")
+        return @find_zone domain.split(".").slice(1).join(".")
 
   get_zone: (domain) ->
     domain = dotize domain
