@@ -5,9 +5,10 @@ configure = (cfg) ->
   zones = new Zones()
 
   debug 'Enumerate the domains listed in the database with a "records" field.'
-  await cfg.prov
-    .query couchapp.id, 'domains', include_docs:true
-    .observe (rec) ->
+  S = cfg.prov.queryAsyncIterable couchapp.id, 'domains', include_docs:true
+
+  for await rec from S
+    do (rec) ->
       doc = rec.doc
       return if not doc?
       if doc.ENUM
@@ -20,9 +21,10 @@ configure = (cfg) ->
       return
 
   debug 'Add any other records (hosts, ..)'
-  await cfg.prov
-    .query couchapp.id, 'names'
-    .observe (rec) ->
+  S = cfg.prov.queryAsyncIterable couchapp.id, 'names'
+
+  for await rec from S
+    do (rec) ->
       domain = rec.key
       return unless domain?
       debug 'add record', domain, JSON.stringify rec.value
