@@ -124,6 +124,7 @@ class Response
   add_soa_to_authoritative: (zone) ->
     zone
     .select_class "SOA"
+    .slice 0, 1
     .forEach (d) => @add_authoritative d
 
   resolve: (name,type,zone) ->
@@ -232,7 +233,7 @@ class DNS
     for q in req.q
       name = q.name
       type = q.typeName
-      if zone = @__zones?.find_zone name
+      if zone = @find_zone name
         response.resolve name, type, zone
 
     response.commit(req, res)
