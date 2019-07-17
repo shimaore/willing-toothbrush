@@ -63,8 +63,6 @@ main = ->
   cfg.serial = get_serial()
   cfg.web_port = parseInt process.env.DNS_WEB_PORT
 
-  await install cfg.prov
-
   debug 'Create server'
   cfg.server4 = dns.createServer 'udp4', new Zones()
   cfg.server6 = dns.createServer 'udp6', new Zones()
@@ -75,6 +73,8 @@ main = ->
   # cfg.server4.listen()
   cfg.server6.port = port
   cfg.server6.listen()
+
+  await install cfg.prov
 
   debug 'Start monitoring changes'
   cfg.prov.changes
@@ -117,12 +117,13 @@ if require.main is module
   debug 'Starting'
   do ->
     try
+      console.log 'Starting'
       [statistics4,statistics6] = await main()
-      debug 'Started'
-      setInterval ->
-        debug 'Requests', statistics4.requests.toString(10), statistics6.requests.toString(10)
-      , 30*1000
+      console.log 'Started'
     catch error
       console.error 'Main failed', error
       process.exit 1
+    setInterval ->
+      debug 'Requests', statistics4.requests.toString(10), statistics6.requests.toString(10)
+    , 30*1000
     return
