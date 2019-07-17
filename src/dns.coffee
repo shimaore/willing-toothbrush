@@ -209,7 +209,7 @@ class DNS
         @resolve req, res
       catch error
         console.error 'resolve', error
-    @port or= 53
+    @port = 53
     @reload zones
 
     @statistics =
@@ -221,8 +221,8 @@ class DNS
   find_zone: (zone) ->
     @__zones?.find_zone zone
 
-  listen: (port) ->
-    @server.bind port or @port
+  listen: ->
+    @server.bind @port
 
   resolve: (req, res) ->
     @statistics.requests++

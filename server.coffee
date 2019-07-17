@@ -71,8 +71,10 @@ main = ->
 
   port = parseInt process.env.DNS_PORT
   port = 53 if isNaN port
-  # cfg.server4.listen port
-  cfg.server6.listen port
+  cfg.server4.port = port
+  # cfg.server4.listen()
+  cfg.server6.port = port
+  cfg.server6.listen()
 
   debug 'Start monitoring changes'
   cfg.prov.changes
