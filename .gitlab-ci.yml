@@ -13,4 +13,5 @@ test:
   image: node:alpine
   script:
   - npm install
+  - npm install
   - npm test
