@@ -5,6 +5,7 @@
 #
 ndns = require('./ndns')
 shuffle = require './shuffle'
+{debug} = (require 'tangible') 'willing-toothbrush:dns'
 
 dotize = (domain) ->
   domain = domain.toLowerCase()
@@ -210,7 +211,7 @@ class DNS
       try
         @resolve req, res
       catch error
-        console.error 'resolve', error
+        debug.dev 'resolve', error
     @port = 53
     @reload zones
 

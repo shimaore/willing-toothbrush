@@ -1,10 +1,10 @@
 configure = (cfg) ->
 
-  debug "Loading zones"
+  debug.dev "Loading zones"
 
   zones = new Zones()
 
-  debug 'Enumerate the domains listed in the database with a "records" field.'
+  debug.dev 'Enumerate the domains listed in the database with a "records" field.'
   rows = cfg.prov.queryAsyncIterable couchapp.id, 'domains', include_docs:true
 
   for await rec from rows
@@ -12,15 +12,15 @@ configure = (cfg) ->
       doc = rec.doc
       return if not doc?
       if doc.ENUM
-        debug 'Ignoring ENUM document', doc
+        debug.dev 'Ignoring ENUM document', doc
         return
       else
-        debug 'new Zone', cfg.serial, JSON.stringify doc
+        debug.dev 'new Zone', cfg.serial, JSON.stringify doc
         zone = new Zone doc.domain, doc, cfg.serial
       zones.add_zone zone
       return
 
-  debug 'Add any other records (hosts, ..)'
+  debug.dev 'Add any other records (hosts, ..)'
   rows = cfg.prov.queryAsyncIterable couchapp.id, 'names'
 
   for await rec from rows
@@ -38,7 +38,7 @@ configure = (cfg) ->
   else
     cfg.serial++
 
-  debug 'Reload zones', serial: cfg.serial
+  debug.dev 'Reload zones', serial: cfg.serial
   cfg.server4.reload zones
   cfg.server6.reload zones
 
@@ -47,7 +47,7 @@ configure = (cfg) ->
 couchapp = require './couchapp'
 
 install = (db) ->
-  debug 'Installing application in database'
+  debug.dev 'Installing application in database'
   try
     await db.update couchapp
     true
@@ -61,7 +61,7 @@ get_serial = ->
   date*100+seq
 
 main = ->
-  debug 'Main'
+  debug.dev 'Main'
   cfg = {}
 
   assert process.env.DNS_PREFIX_ADMIN?, 'Please provide DNS_PREFIX_ADMIN'
@@ -70,11 +70,11 @@ main = ->
 
   await install cfg.prov
 
-  debug 'Create server'
+  debug.dev 'Create server'
   cfg.server4 = dns.createServer 'udp4', new Zones()
   cfg.server6 = dns.createServer 'udp6', new Zones()
 
-  debug 'Initial configuration'
+  debug.dev 'Initial configuration'
   await configure cfg
 
   port = parseInt process.env.DNS_PORT
@@ -84,7 +84,7 @@ main = ->
   cfg.server6.port = port
   cfg.server6.listen()
 
-  debug 'Start monitoring changes'
+  debug.dev 'Start monitoring changes'
   needs_reconfigure = false
 
   cfg.prov.changes
@@ -94,11 +94,11 @@ main = ->
   .filter ({id}) ->
     id.match /^(domain|host):/
   .observe ({id}) ->
-    debug "Reconfiguring due to #{id}"
+    debug.dev "Reconfiguring due to #{id}"
     needs_reconfigure = true
     return
   .catch (error) ->
-    console.error 'Monitoring changes:', error
+    debug.dev 'Monitoring changes:', error
     process.exit 1
 
   setInterval ->
@@ -108,7 +108,7 @@ main = ->
         await configure cfg
         needs_reconfigure = false
       catch error
-        console.error 'reconfigure', error
+        debug.dev 'reconfigure', error
   , 60*1000
 
   return [cfg.server4.statistics,cfg.server6.statistics]
@@ -132,6 +132,6 @@ if require.main is module
       console.error 'Main failed', error
       process.exit 1
     setInterval ->
-      debug 'Requests', statistics4.requests.toString(10), statistics6.requests.toString(10)
+      debug.dev 'Requests', statistics4.requests.toString(10), statistics6.requests.toString(10)
     , 30*1000
     return
