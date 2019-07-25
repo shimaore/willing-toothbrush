@@ -112,19 +112,19 @@ class Response
           return
 
       name = dotize name
-      zone = @server.find_zone name
-      # Nothing to add if we don't know about that zone.
-      return unless zone?
       additionals.add name
       return
 
     for name from additionals
-      zone
-      .select "A", name
-      .forEach (d) => @add_additional shuffle d
-      zone
-      .select "AAAA", name
-      .forEach (d) => @add_additional shuffle d
+      zone = @server.find_zone name
+      # Nothing to add if we don't know about that zone.
+      if zone?
+        zone
+        .select "A", name
+        .forEach (d) => @add_additional shuffle d
+        zone
+        .select "AAAA", name
+        .forEach (d) => @add_additional shuffle d
     return
 
   add_soa_to_authoritative: (zone) ->
