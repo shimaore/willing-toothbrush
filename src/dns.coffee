@@ -99,6 +99,7 @@ class Response
     .forEach (d) => @add_authoritative shuffle d
 
   add_additionals: ->
+    additionals = new Set()
     [@answer..., @authoritative...].forEach (record) =>
       switch
         # Resolution for explicit names (CNAME, NS, …)
@@ -114,7 +115,10 @@ class Response
       zone = @server.find_zone name
       # Nothing to add if we don't know about that zone.
       return unless zone?
+      additionals.add name
+      return
 
+    for name from additionals
       zone
       .select "A", name
       .forEach (d) => @add_additional shuffle d
