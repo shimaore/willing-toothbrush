@@ -14,7 +14,7 @@
   "dependencies": {
     "coffeescript-helpers": "^2.2.0",
     "freelist": "^1.0.3",
-    "most-couchdb": "^3.7.3",
+    "most-couchdb": "^3.8.0",
     "tangible": "^3.1.0"
   },
   "devDependencies": {
