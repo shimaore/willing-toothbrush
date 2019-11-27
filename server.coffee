@@ -102,6 +102,10 @@ main = ->
     process.exit 1
 
   setInterval ->
+    needs_reconfigure = true
+  , 691231 # ~11 minutes
+
+  setInterval ->
     do ->
       try
         return unless needs_reconfigure
