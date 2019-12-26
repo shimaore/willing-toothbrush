@@ -1,5 +1,5 @@
     pkg = require './package.json'
-    app_version = '2.0'
+    app_version = '3.0'
     id = "#{pkg.name}-#{app_version}-dns"
 
     ddoc =
@@ -121,7 +121,6 @@ RFC 4291 (multicast)
                 do (name,_) ->
                   fqdn = name+'.'+doc.host
                   if _.ipv4
-                    ip_to_name[_.ipv4] = fqdn
                     if name is 'primary'
                       primary_v4 = _.ipv4
                     else
@@ -129,19 +128,33 @@ RFC 4291 (multicast)
                         primary_v4 ?= _.ipv4
                       else
                         private_v4 ?= _.ipv4
+
                     emit host,
                       prefix:name
                       class:'A',
                       value:_.ipv4
+
+                    ip_to_name[_.ipv4] = 'v4.'+fqdn
+                    emit host,
+                      prefix:'v4.'+name
+                      class:'A',
+                      value:_.ipv4
+
                   if _.ipv6
-                    ip_to_name[_.ipv6] = fqdn
                     if name is 'primary'
                       primary_v6 = _.ipv6
                     else
                       if not v6_is_private _.ipv6
                         primary_v6 ?= _.ipv6
+
                     emit host,
                       prefix:name
+                      class:'AAAA'
+                      value:_.ipv6
+
+                    ip_to_name[_.ipv6] = 'v6.'+fqdn
+                    emit host,
+                      prefix:'v6.'+name
                       class:'AAAA'
                       value:_.ipv6
 
@@ -150,14 +163,24 @@ If no public IPv4 is present, use a private IPv4 for the primary interface.
               primary_v4 ?= private_v4
 
               if primary_v4?
-                ip_to_name[primary_v4] = doc.host
                 emit host,
                   class:'A'
                   value:primary_v4
 
-              if primary_v6?
-                ip_to_name[primary_v6] = doc.host
+                ip_to_name[primary_v4] = 'v4.'+doc.host
                 emit host,
+                  prefix:'v4'
+                  class:'A'
+                  value:primary_v4
+
+              if primary_v6?
+                emit host,
+                  class:'AAAA'
+                  value:primary_v6
+
+                ip_to_name[primary_v6] = 'v6.'+doc.host
+                emit host,
+                  prefix:'v6'
                   class:'AAAA'
                   value:primary_v6
 
