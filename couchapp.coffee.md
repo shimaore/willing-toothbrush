@@ -1,5 +1,5 @@
     pkg = require './package.json'
-    app_version = '3.1'
+    app_version = '3.2'
     id = "#{pkg.name}-#{app_version}-dns"
 
     ddoc =
@@ -99,6 +99,8 @@ RFC 4291 (multicast)
 
         ip_to_name = {}
 
+        _sip_udp = '_sip._udp.'
+
         switch doc.type
 
           when 'host'
@@ -170,6 +172,7 @@ If no public IPv4 is present, use a private IPv4 for the primary interface.
                   value:primary_v4
 
                 ip_to_name[primary_v4] = 'v4.'+doc.host
+                ip_to_name['ipv4']     = 'v4.'+doc.host
                 emit host,
                   prefix:'v4'
                   class:'A'
@@ -181,6 +184,7 @@ If no public IPv4 is present, use a private IPv4 for the primary interface.
                   value:primary_v6
 
                 ip_to_name[primary_v6] = 'v6.'+doc.host
+                ip_to_name['ipv6']     = 'v6.'+doc.host
                 emit host,
                   prefix:'v6'
                   class:'AAAA'
@@ -208,8 +212,6 @@ If no public IPv4 is present, use a private IPv4 for the primary interface.
 Different profiles with the same name in the same domain are reputed to be the same (i.e. equivalent routes in a cluster).
 Note: SRV records must use names. So if `ip_to_name` does not have a mapping we use the host name and assume the best.
 (Also, `ingress_sip_ip` and `egress_sip_ip` are supposed to be local addresses, so if the "interfaces" field is populated properly this shouldn't be an issue.)
-
-                      _sip_udp = '_sip._udp.'
 
 * doc.host.sip_profiles[].ingress_sip_ip (string) Mapped to the DNS name of an interface for the purpose of creating `_sip._udp.ingress-<name>.<sip_domain_name>` SRV records. Required.
 * doc.host.sip_profiles[].ingress_sip_port (integer) Port for DNS `_sip._udp.ingress-<name>.<sip_domain_name>` SRV records. Required.
@@ -273,10 +275,19 @@ Note: if proxy_ip is not specified, opensips will be available on all interfaces
 * doc.host.opensips.proxy_ip Used to create a DNS `A` record for doc.host.sip_domain_name. Default: public IPv4 address of the host.
 * doc.host.opensips.proxy_port Used to create a DNS `SRV` record for doc.host.sip_domain_name. Default: 5060.
 
-                if doc.opensips.proxy_ip? or primary_v4?
-                  emit domain,
-                    class:'A'
-                    value: doc.opensips.proxy_ip ? primary_v4
+                ip = doc.opensips.proxy_ip ? primary_v4
+                ip = primary_v4 if ip is 'ipv4'
+                ip = primary_v6 if ip is 'ipv6'
+                switch
+                  when ip?.match /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/
+                    emit domain,
+                      class:'A'
+                      value: ip
+                  when ip?.match /^[0-9a-f:]+$/
+                    emit domain,
+                      class:'AAAA'
+                      value: ip
+
                 emit domain,
                   prefix:'_sip._udp'
                   class:'SRV'
@@ -286,3 +297,5 @@ Note: if proxy_ip is not specified, opensips will be available on all interfaces
                     doc.opensips.proxy_port ? 5060
                     ip_to_name[doc.opensips.proxy_ip] ? doc.host
                   ]
+
+        return
