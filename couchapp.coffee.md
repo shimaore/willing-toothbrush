@@ -1,5 +1,5 @@
     pkg = require './package.json'
-    app_version = '3.0'
+    app_version = '3.1'
     id = "#{pkg.name}-#{app_version}-dns"
 
     ddoc =
@@ -135,6 +135,7 @@ RFC 4291 (multicast)
                       value:_.ipv4
 
                     ip_to_name[_.ipv4] = 'v4.'+fqdn
+                    ip_to_name['ipv4'] = 'v4.'+fqdn
                     emit host,
                       prefix:'v4.'+name
                       class:'A',
@@ -153,6 +154,7 @@ RFC 4291 (multicast)
                       value:_.ipv6
 
                     ip_to_name[_.ipv6] = 'v6.'+fqdn
+                    ip_to_name['ipv6'] = 'v6.'+fqdn
                     emit host,
                       prefix:'v6.'+name
                       class:'AAAA'
